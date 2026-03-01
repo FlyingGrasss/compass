@@ -28,12 +28,20 @@ export default async function Home() {
             </p>
             <div className="flex gap-4 justify-center">
               {session ? (
-                <Link
-                  href="/profile"
-                  className="px-8 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
-                >
-                  Profil
-                </Link>
+                <>
+                  <Link
+                    href="/profile"
+                    className="px-8 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
+                  >
+                    Profil
+                  </Link>
+                  <Link
+                    href="/activities"
+                    className="px-8 py-3 bg-white hover:bg-white/90 text-[#2458B4] font-medium rounded-lg transition-colors cursor-pointer"
+                  >
+                    Etkinlikler
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link
