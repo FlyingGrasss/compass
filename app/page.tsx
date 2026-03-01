@@ -2,8 +2,15 @@
 
 import Link from "next/link"
 import { Briefcase, BookOpen, Users } from "lucide-react"
+import { auth } from "@/auth"
+import { headers } from "next/headers"
 
-export default function Home() {
+export default async function Home() {
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -20,18 +27,31 @@ export default function Home() {
               gelişim fırsatları platformu
             </p>
             <div className="flex gap-4 justify-center">
-              <Link
-                href="/auth/sign-up"
-                className="px-8 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
-              >
-                Hemen Başla
-              </Link>
-              <Link
-                href="/auth/sign-in"
-                className="px-8 py-3 bg-white hover:bg-white/90 text-[#2458B4] font-medium rounded-lg transition-colors cursor-pointer"
-              >
-                Giriş Yap
-              </Link>
+              {session ? (
+                <Link
+                  href="/profile"
+                  className="px-8 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
+                >
+                  Profil
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/sign-up"
+                    className="px-8 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
+                  >
+                    Hemen Başla
+                  </Link>
+                  <Link
+                    href="/auth/sign-in"
+                    className="px-8 py-3 bg-white hover:bg-white/90 text-[#2458B4] font-medium rounded-lg transition-colors cursor-pointer"
+                  >
+                    Giriş Yap
+                  </Link>
+                </>
+              )
+              }
+              
             </div>
           </div>
         </div>
