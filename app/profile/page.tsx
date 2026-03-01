@@ -23,6 +23,10 @@ export default function ProfilePage() {
     router.push("/auth/sign-in")
   }
 
+  const handleAdmin = async () => {
+    router.push("/admin")
+  }
+
   if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -60,7 +64,13 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 flex justify-between">
+              <button
+                onClick={handleAdmin}
+                className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors cursor-pointer"
+              >
+                Etkinlikleri Düzenle
+              </button>
               <button
                 onClick={handleSignOut}
                 className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors cursor-pointer"
