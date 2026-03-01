@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "snowday@balogrenci.org",
         to: email,
         subject: "E-posta Doğrulama Kodu",
         html: `
