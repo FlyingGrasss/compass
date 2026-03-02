@@ -2,15 +2,16 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signUp } from "@/lib/auth-client"
+import { signUp, useSession } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { Mail, X } from "lucide-react"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { data: session, isPending } = useSession()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,6 +21,13 @@ export default function SignUpPage() {
   const [showVerificationModal, setShowVerificationModal] = useState(false)
   const [verificationCode, setVerificationCode] = useState("")
   const [isVerifying, setIsVerifying] = useState(false)
+
+  // Redirect to profile if already logged in
+  useEffect(() => {
+    if (!isPending && session) {
+      router.push("/profile")
+    }
+  }, [session, isPending, router])
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -113,6 +121,20 @@ export default function SignUpPage() {
     } finally {
       setIsVerifying(false)
     }
+  }
+
+  // Show loading state while checking session
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-[#242F50]">Yükleniyor...</div>
+      </div>
+    )
+  }
+
+  // Redirect happens in useEffect, show nothing while redirecting
+  if (session) {
+    return null
   }
 
   return (

@@ -86,7 +86,7 @@ export default function ProfilePage() {
           {/* Actions */}
           <div className="flex flex-col gap-4 pt-4">
             <button
-              onClick={() => redirect("/admin")}
+              onClick={() => router.push("/admin")}
               className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors cursor-pointer"
             >
               Etkinlik Düzenle
