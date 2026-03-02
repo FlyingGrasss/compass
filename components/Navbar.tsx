@@ -35,7 +35,7 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              href={session ? "/admin/activites" : "/activites"}
+              href={session ? "/admin/activities" : "/activities"}
               className="text-sm text-[#242F50]/70 hover:text-[#2458B4] transition-colors cursor-pointer"
             >
               {session ? "Admin" : "Etkinlikler"}
