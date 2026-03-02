@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +18,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Snow.day - Staj ve Fırsatlar Platformu",
+  title: "Compass - Staj ve Fırsatlar Platformu",
   description:
     "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu. Binlerce fırsat keşfet!",
   keywords: [
@@ -28,28 +30,28 @@ export const metadata: Metadata = {
     "yarışma",
     "gönüllülük",
   ],
-  authors: [{ name: "Snow.day" }],
+  authors: [{ name: "Compass" }],
   metadataBase: new URL("https://snowday-flax.vercel.app"),
   openGraph: {
     type: "website",
     locale: "tr_TR",
     url: "https://snowday-flax.vercel.app",
-    title: "Snow.day - Staj ve Fırsatlar Platformu",
+    title: "Compass - Staj ve Fırsatlar Platformu",
     description:
       "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu.",
-    siteName: "Snow.day",
+    siteName: "Compass",
     images: [
       {
         url: "/icon.png",
         width: 1200,
         height: 630,
-        alt: "Snow.day",
+        alt: "Compass",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Snow.day - Staj ve Fırsatlar Platformu",
+    title: "Compass - Staj ve Fırsatlar Platformu",
     description:
       "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu.",
     images: ["/icon.png"],
@@ -68,9 +70,11 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#AAD0F2]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#AAD0F2] flex flex-col min-h-screen`}
       >
-        {children}
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
         <Toaster />
       </body>
     </html>
