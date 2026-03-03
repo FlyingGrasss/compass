@@ -49,14 +49,14 @@ export default function Navbar() {
                 >
                   {session.user?.name || "Profil"}
                 </Link>
-                {session.user?.email === "your-admin-email@example.com" && (
+                
                   <Link
                     href="/admin"
                     className="text-sm text-[#2458B4] font-medium hover:text-[#1d4a95] transition-colors cursor-pointer"
                   >
                     Panel
                   </Link>
-                )}
+                
                 <button
                   onClick={handleSignOut}
                   className="text-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer"
@@ -114,8 +114,7 @@ export default function Navbar() {
                   onClick={() => setIsOpen(false)}
                 >
                   Profil
-                </Link>
-                {session.user?.email === "your-admin-email@example.com" && (
+                
                   <Link
                     href="/admin"
                     className="block px-4 py-2 text-sm text-[#2458B4] font-medium hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
