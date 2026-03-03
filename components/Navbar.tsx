@@ -49,14 +49,14 @@ export default function Navbar() {
                 >
                   {session.user?.name || "Profil"}
                 </Link>
-                
-                  <Link
-                    href="/admin"
-                    className="text-sm text-[#2458B4] font-medium hover:text-[#1d4a95] transition-colors cursor-pointer"
-                  >
-                    Panel
-                  </Link>
-                
+
+                <Link
+                  href="/admin"
+                  className="text-sm text-[#2458B4] font-medium hover:text-[#1d4a95] transition-colors cursor-pointer"
+                >
+                  Panel
+                </Link>
+
                 <button
                   onClick={handleSignOut}
                   className="text-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer"
@@ -97,10 +97,11 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden pb-4 space-y-2 border-t border-[#242F50]/10">
+          <div className="md:hidden pb-4 space-y-2 border-t border-[#242F50]/10 mt-2">
             <Link
               href={session ? "/admin/activities" : "/activities"}
-              className="text-sm text-[#242F50]/70 hover:text-[#2458B4] transition-colors cursor-pointer"
+              className="block px-4 py-2 text-sm text-[#242F50]/70 hover:text-[#2458B4] hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
+              onClick={() => setIsOpen(false)}
             >
               {session ? "Admin" : "Etkinlikler"}
             </Link>
@@ -113,9 +114,16 @@ export default function Navbar() {
                   onClick={() => setIsOpen(false)}
                 >
                   {session.user?.name || "Profil"}
-                
-                  
-                
+                </Link>
+
+                <Link
+                  href="/admin"
+                  className="block px-4 py-2 text-sm text-[#2458B4] font-medium hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Panel
+                </Link>
+
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
