@@ -99,11 +99,10 @@ export default function Navbar() {
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2 border-t border-[#242F50]/10">
             <Link
-              href="/activities"
-              className="block px-4 py-2 text-sm text-[#242F50]/70 hover:text-[#2458B4] hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
-              onClick={() => setIsOpen(false)}
+              href={session ? "/admin/activities" : "/activities"}
+              className="text-sm text-[#242F50]/70 hover:text-[#2458B4] transition-colors cursor-pointer"
             >
-              Etkinlikler
+              {session ? "Admin" : "Etkinlikler"}
             </Link>
 
             {session ? (
@@ -113,15 +112,9 @@ export default function Navbar() {
                   className="block px-4 py-2 text-sm text-[#242F50]/70 hover:text-[#2458B4] hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
-                  Profil
+                  {session.user?.name || "Profil"}
                 
-                  <Link
-                    href="/admin"
-                    className="block px-4 py-2 text-sm text-[#2458B4] font-medium hover:bg-[#E6F1FB] rounded transition-colors cursor-pointer"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Panel
-                  </Link>
+                  
                 )}
                 <button
                   onClick={handleSignOut}
