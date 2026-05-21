@@ -2,12 +2,12 @@
 
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Briefcase, BookOpen, Users, Search, GraduationCap, Award, Compass, ArrowRight, DollarSign, CheckCircle2 } from "lucide-react"
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "")
@@ -19,7 +19,6 @@ export default function Home() {
     }
   }
 
-  // Highlights of outstanding scholarships
   const highlights = [
     {
       name: "Clarendon Fund Scholarships",
@@ -45,8 +44,7 @@ export default function Home() {
       slug: "bezos-scholars-program",
       badge: "Liderlik",
     },
-  ];
-
+  ]
 
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-[#2B0510]">
@@ -122,40 +120,31 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="bg-[#FFFDF9] rounded-2xl border border-[#F1E2D9] p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="w-14 h-14 bg-[#FFE5B4]/50 text-[#7B1B38] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xs">
                 <GraduationCap className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">
-                Burs Rehberliği
-              </h3>
+              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">Burs Rehberliği</h3>
               <p className="text-[#2B0510]/80 font-medium text-sm leading-relaxed">
                 Dünyanın dört bir yanından, lise ve üniversite seviyesindeki öğrencilere özel yüzlerce burs fırsatına ücretsiz erişim.
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="bg-[#FFFDF9] rounded-2xl border border-[#F1E2D9] p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="w-14 h-14 bg-[#FFE5B4]/50 text-[#7B1B38] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xs">
                 <Briefcase className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">
-                Yurt Dışında Okuma
-              </h3>
+              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">Yurt Dışında Okuma</h3>
               <p className="text-[#2B0510]/80 font-medium text-sm leading-relaxed">
                 Fırsat eşitsizliğini engellemek için tasarlanmış bağımsız rehberlik. Yurt dışı okuma imkanlarını kolayca öğrenin.
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="bg-[#FFFDF9] rounded-2xl border border-[#F1E2D9] p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="w-14 h-14 bg-[#FFE5B4]/50 text-[#7B1B38] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xs">
                 <Users className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">
-                Kar Amacı Gütmeyen Yapı
-              </h3>
+              <h3 className="text-xl font-bold text-[#7B1B38] mb-3">Kar Amacı Gütmeyen Yapı</h3>
               <p className="text-[#2B0510]/80 font-medium text-sm leading-relaxed">
                 Compass, gençler için tamamen ücretsiz ve kâr amacı gütmeyen, gönüllülük esasıyla çalışan bir pusuladır.
               </p>
@@ -195,20 +184,15 @@ export default function Home() {
                     <span className="text-[10px] text-[#7A696C] font-semibold">{item.location}</span>
                   </div>
                   
-                  <h3 className="text-lg font-bold text-[#2B0510] leading-snug">
-                    {item.name}
-                  </h3>
+                  <h3 className="text-lg font-bold text-[#2B0510] leading-snug">{item.name}</h3>
                   
-                  <p className="text-xs font-medium text-[#2B0510]/80 leading-relaxed line-clamp-3">
-                    {item.desc}
-                  </p>
+                  <p className="text-xs font-medium text-[#2B0510]/80 leading-relaxed line-clamp-3">{item.desc}</p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-[#F1E2D9]/60 flex items-center justify-between">
                   <span className="inline-flex items-center text-xs font-bold text-[#7B1B38] bg-[#FFE5B4]/25 px-2 py-1 rounded-lg">
                     <DollarSign className="w-3.5 h-3.5" /> {item.support.split(" ")[0]}
                   </span>
-                  
                   <Link
                     href={`/scholarships?search=${encodeURIComponent(item.name)}`}
                     className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] hover:text-[#5A1127] group"
@@ -219,7 +203,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
         </div>
       </div>
 
@@ -261,7 +244,14 @@ export default function Home() {
           </div>
         </div>
       </div>
-
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   )
 }
