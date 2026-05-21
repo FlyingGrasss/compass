@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Users,
 } from "lucide-react"
+import { ActivityCategory } from "@prisma/client"
 import Link from "next/link"
 
 export default async function ActivityDetailPage({
@@ -26,7 +27,7 @@ export default async function ActivityDetailPage({
     notFound()
   }
 
-  const categoryLabels = {
+  const categoryLabels: Record<ActivityCategory, string> = {
     COMPETITION: "Yarışma",
     VOLUNTEER: "Gönüllülük",
     SUMMER_PROGRAM: "Yaz Programı",
@@ -74,7 +75,7 @@ export default async function ActivityDetailPage({
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
-                  {categoryLabels[activity.category]}
+                  {categoryLabels[activity.category as ActivityCategory]}
                 </span>
                 {activity.isPrestigious && (
                   <span className="px-3 py-1 text-xs font-black rounded-full bg-[#7B1B38] text-white flex items-center uppercase tracking-wider">

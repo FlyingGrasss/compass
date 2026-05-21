@@ -3,13 +3,14 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Briefcase, BookOpen, Users, Search, GraduationCap, Award, Compass, ArrowRight, DollarSign, CheckCircle2 } from "lucide-react"
 
-export default function Home({ searchParams }: { searchParams?: { search?: string } }) {
+export default function Home() {
   const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState(searchParams?.search || "")
+  const searchParams = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "")
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
