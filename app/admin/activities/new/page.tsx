@@ -147,6 +147,7 @@ export default function NewActivityPage() {
                 <option value="VOLUNTEER">Gönüllülük</option>
                 <option value="SUMMER_PROGRAM">Yaz Programı</option>
                 <option value="SCHOOL_PROGRAM">Okul Programı</option>
+                <option value="PLATFORM">Platform</option>
               </select>
             </div>
 

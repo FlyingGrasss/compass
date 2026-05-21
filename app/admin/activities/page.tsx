@@ -22,6 +22,8 @@ export default function AdminActivitiesPage() {
     VOLUNTEER: "Gönüllülük",
     SUMMER_PROGRAM: "Yaz Programı",
     SCHOOL_PROGRAM: "Okul Programı",
+    SCHOLARSHIP: "Burs",
+    PLATFORM: "Platform",
   }
 
   useEffect(() => {
@@ -121,6 +123,7 @@ export default function AdminActivitiesPage() {
             <option value="VOLUNTEER">Gönüllülük</option>
             <option value="SUMMER_PROGRAM">Yaz Programları</option>
             <option value="SCHOOL_PROGRAM">Okul Programları</option>
+            <option value="PLATFORM">Platformlar</option>
           </select>
         </div>
       </div>

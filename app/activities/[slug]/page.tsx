@@ -31,6 +31,7 @@ export default async function ActivityDetailPage({
     VOLUNTEER: "Gönüllülük",
     SUMMER_PROGRAM: "Yaz Programı",
     SCHOOL_PROGRAM: "Okul Programı",
+    SCHOLARSHIP: "Burs",
   }
 
   const seasonLabels = {
@@ -42,155 +43,161 @@ export default async function ActivityDetailPage({
   }
 
   const financialLabels: Record<string, string> = {
-    "A+": "Tam Burslu",
-    A: "Çoğunlukla Burslu",
-    B: "Kısmen Burslu",
-    C: "Sınırlı Burs",
+    "A+": "Tam Burslu (Eğitim + Yaşam)",
+    A: "Büyük Ölçüde Burslu",
+    B: "Kısmen Burslu / Ödül",
+    C: "Sınırlı Burs / Çekiliş",
     D: "Burssuz",
   }
 
   return (
-    <main className="min-h-screen bg-[#E6F1FB]">
+    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/activities"
-          className="inline-flex items-center text-[#2458B4] hover:text-[#1d4a95] mb-6 cursor-pointer"
+          className="inline-flex items-center text-[#7B1B38] font-bold hover:text-[#5A1127] mb-6 cursor-pointer"
         >
-          ← Tüm Etkinlikler
+          ← Tüm Fırsatlara Dön
         </Link>
 
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white rounded-3xl border border-[#F1E2D9] shadow-xl overflow-hidden">
           {activity.imageUrl && (
             <img
               src={activity.imageUrl}
               alt={activity.name}
-              className="w-full h-96 object-cover"
+              className="w-full h-80 sm:h-96 object-cover"
             />
           )}
 
-          <div className="p-8 space-y-6">
+          <div className="p-8 space-y-8">
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="px-3 py-1 text-sm font-semibold rounded-full bg-[#AAD0F2] text-[#242F50]">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
                   {categoryLabels[activity.category]}
                 </span>
                 {activity.isPrestigious && (
-                  <span className="px-3 py-1 text-sm font-semibold rounded-full bg-[#2458B4] text-white">
-                    <Award className="w-4 h-4 inline mr-1" />
+                  <span className="px-3 py-1 text-xs font-black rounded-full bg-[#7B1B38] text-white flex items-center uppercase tracking-wider">
+                    <Award className="w-3.5 h-3.5 mr-1" />
                     Prestijli
                   </span>
                 )}
-                <span className="px-3 py-1 text-sm font-semibold rounded-full bg-[#E6F1FB] text-[#242F50]">
-                  {activity.financialSupport}
-                </span>
+                {activity.isClosed ? (
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-700">
+                    Başvurular Kapalı
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700">
+                    Başvurular Açık
+                  </span>
+                )}
               </div>
-              <h1 className="text-4xl font-bold text-[#242F50] mb-4">
+              <h1 className="text-3xl sm:text-4xl font-black text-[#2B0510] tracking-tight leading-tight">
                 {activity.name}
               </h1>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#FFFDF9] border border-[#F1E2D9]/70 rounded-2xl p-6">
               {activity.location && (
-                <div className="flex items-center gap-3 text-[#242F50]">
-                  <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                    <MapPin className="w-5 h-5 text-[#2458B4]" />
+                <div className="flex items-center gap-3 text-[#2B0510]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                    <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#242F50]/70">Konum</p>
-                    <p className="font-medium">{activity.location}</p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">Konum / Lokasyon</p>
+                    <p className="font-bold text-sm">{activity.location}</p>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-[#242F50]">
-                <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                  <Clock className="w-5 h-5 text-[#2458B4]" />
+              <div className="flex items-center gap-3 text-[#2B0510]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                  <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#242F50]/70">Süre</p>
-                  <p className="font-medium">{activity.duration}</p>
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Süre / Süreç</p>
+                  <p className="font-bold text-sm">{activity.duration}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-[#242F50]">
-                <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                  <Calendar className="w-5 h-5 text-[#2458B4]" />
+              <div className="flex items-center gap-3 text-[#2B0510]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                  <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#242F50]/70">Dönem</p>
-                  <p className="font-medium">{seasonLabels[activity.season]}</p>
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Dönem</p>
+                  <p className="font-bold text-sm">{seasonLabels[activity.season]}</p>
                 </div>
               </div>
 
               {activity.deadline && (
-                <div className="flex items-center gap-3 text-[#242F50]">
-                  <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                    <Calendar className="w-5 h-5 text-[#2458B4]" />
+                <div className="flex items-center gap-3 text-[#2B0510]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                    <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#242F50]/70">Son Başvuru</p>
-                    <p className="font-medium">
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">Son Başvuru Tarihi</p>
+                    <p className="font-bold text-sm">
                       {new Date(activity.deadline).toLocaleDateString("tr-TR")}
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-[#242F50]">
-                <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                  <DollarSign className="w-5 h-5 text-[#2458B4]" />
+              <div className="flex items-center gap-3 text-[#2B0510]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                  <DollarSign className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#242F50]/70">Finansal Destek</p>
-                  <p className="font-medium">
-                    {financialLabels[activity.financialSupport]}
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Maddi Destek</p>
+                  <p className="font-bold text-sm">
+                    {financialLabels[activity.financialSupport] || activity.financialSupport}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-[#242F50]">
-                <div className="p-2 bg-[#AAD0F2] rounded-lg">
-                  <Users className="w-5 h-5 text-[#2458B4]" />
+              <div className="flex items-center gap-3 text-[#2B0510]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                  <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#242F50]/70">Sınıf Seviyeleri</p>
-                  <p className="font-medium">
-                    {activity.gradeLevels.map((l) => `${l}.`).join(", ")} Sınıf
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Hedef Sınıflar</p>
+                  <p className="font-bold text-sm">
+                    {activity.gradeLevels.map((l) => `${l}.`).join(", ")} Sınıflar
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-[#242F50]/10 pt-6">
-              <h2 className="text-2xl font-bold text-[#242F50] mb-3">
-                Açıklama
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
+                Açıklama / Detaylar
               </h2>
-              <p className="text-[#242F50]/80 whitespace-pre-line leading-relaxed">
+              <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm text-justify">
                 {activity.description}
               </p>
             </div>
 
             {activity.requirements && (
-              <div className="border-t border-[#242F50]/10 pt-6">
-                <h2 className="text-2xl font-bold text-[#242F50] mb-3">
-                  Gereksinimler
+              <div className="space-y-4 pt-4">
+                <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
+                  Katılım Koşulları & Gereksinimler
                 </h2>
-                <p className="text-[#242F50]/80 whitespace-pre-line leading-relaxed">
+                <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm">
                   {activity.requirements}
                 </p>
               </div>
             )}
 
             {activity.website && (
-              <div className="border-t border-[#242F50]/10 pt-6">
+              <div className="pt-6 border-t border-[#F1E2D9]">
                 <a
                   href={activity.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:scale-105 duration-200"
                 >
                   <ExternalLink className="w-5 h-5" />
-                  Resmi Websiteyi Ziyaret Et
+                  Resmi Başvuru Sitesini Ziyaret Et
                 </a>
               </div>
             )}

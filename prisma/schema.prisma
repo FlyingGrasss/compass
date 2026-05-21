@@ -79,6 +79,7 @@ model Activity {
   gradeLevels     Int[]
   financialSupport String
   isPrestigious   Boolean          @default(false)
+  isClosed        Boolean          @default(false)
   season          ActivitySeason
   duration        String
   deadline        DateTime?
@@ -97,6 +98,8 @@ enum ActivityCategory {
   VOLUNTEER
   SUMMER_PROGRAM
   SCHOOL_PROGRAM
+  SCHOLARSHIP
+  PLATFORM
 }
 
 enum ActivitySeason {
