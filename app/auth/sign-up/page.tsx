@@ -126,8 +126,8 @@ export default function SignUpPage() {
   // Show loading state while checking session
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-[#242F50]">Yükleniyor...</div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-[#2B0510]">Yükleniyor...</div>
       </div>
     )
   }
@@ -138,19 +138,19 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4">
+    <main className="flex items-center justify-center min-h-screen p-4 bg-background">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-[#F1E2D9] p-8 space-y-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-[#242F50]">Kayıt Ol</h1>
-            <p className="mt-2 text-[#242F50]/70">Yeni hesap oluşturun</p>
+            <h1 className="text-3xl font-bold text-[#2B0510]">Kayıt Ol</h1>
+            <p className="mt-2 text-[#2B0510]/70">Yeni hesap oluşturun</p>
           </div>
 
           <form onSubmit={handleSendCode} className="space-y-4">
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-[#242F50] mb-1.5"
+                className="block text-sm font-medium text-[#2B0510] mb-1.5"
               >
                 Ad Soyad
               </label>
@@ -160,7 +160,7 @@ export default function SignUpPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] placeholder:text-[#242F50]/40"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
                 placeholder="Adınız Soyadınız"
               />
             </div>
@@ -168,7 +168,7 @@ export default function SignUpPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-[#242F50] mb-1.5"
+                className="block text-sm font-medium text-[#2B0510] mb-1.5"
               >
                 E-posta
               </label>
@@ -178,7 +178,7 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] placeholder:text-[#242F50]/40"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
                 placeholder="ornek@email.com"
               />
             </div>
@@ -186,7 +186,7 @@ export default function SignUpPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-[#242F50] mb-1.5"
+                className="block text-sm font-medium text-[#2B0510] mb-1.5"
               >
                 Şifre
               </label>
@@ -197,7 +197,7 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] placeholder:text-[#242F50]/40"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
                 placeholder="En az 8 karakter"
               />
             </div>
@@ -205,7 +205,7 @@ export default function SignUpPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-[#242F50] mb-1.5"
+                className="block text-sm font-medium text-[#2B0510] mb-1.5"
               >
                 Şifre Tekrar
               </label>
@@ -216,7 +216,7 @@ export default function SignUpPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] placeholder:text-[#242F50]/40"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
                 placeholder="Şifrenizi tekrar girin"
               />
             </div>
@@ -224,17 +224,17 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-6"
+              className="w-full py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-6"
             >
               {isLoading ? "Kod gönderiliyor..." : "Devam Et"}
             </button>
           </form>
 
           <div className="text-center text-sm">
-            <span className="text-[#242F50]/70">Zaten hesabınız var mı? </span>
+            <span className="text-[#2B0510]/70">Zaten hesabınız var mı? </span>
             <Link
               href="/auth/sign-in"
-              className="text-[#2458B4] hover:text-[#1d4a95] font-medium"
+              className="text-[#7B1B38] hover:text-[#5A1127] font-medium"
             >
               Giriş Yap
             </Link>
@@ -245,25 +245,25 @@ export default function SignUpPage() {
       {/* Verification Modal */}
       {showVerificationModal && (
         <div className="fixed inset-0 bg-background flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full relative">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#F1E2D9] p-8 max-w-md w-full relative">
             <button
               onClick={() => setShowVerificationModal(false)}
               disabled={isVerifying}
-              className="absolute top-4 right-4 text-[#242F50]/40 hover:text-[#242F50] cursor-pointer disabled:opacity-50"
+              className="absolute top-4 right-4 text-[#2B0510]/40 hover:text-[#2B0510] cursor-pointer disabled:opacity-50"
             >
               <X className="w-6 h-6" />
             </button>
 
             <div className="text-center space-y-6">
-              <div className="w-16 h-16 bg-[#AAD0F2] rounded-full flex items-center justify-center mx-auto">
-                <Mail className="w-8 h-8 text-[#2458B4]" />
+              <div className="w-16 h-16 bg-[#FFE5B4] rounded-full flex items-center justify-center mx-auto">
+                <Mail className="w-8 h-8 text-[#7B1B38]" />
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-[#242F50]">
+                <h2 className="text-2xl font-bold text-[#2B0510]">
                   Kodu Girin
                 </h2>
-                <p className="mt-2 text-[#242F50]/70">
+                <p className="mt-2 text-[#2B0510]/70">
                   <strong>{email}</strong> adresine gönderilen 6 haneli kodu
                   girin
                 </p>
@@ -279,7 +279,7 @@ export default function SignUpPage() {
                   }}
                   maxLength={6}
                   placeholder="000000"
-                  className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] text-center text-2xl font-mono tracking-widest placeholder:text-[#242F50]/40"
+                  className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] text-center text-2xl font-mono tracking-widest placeholder:text-[#2B0510]/40"
                   required
                   autoFocus
                   disabled={isVerifying}
@@ -288,7 +288,7 @@ export default function SignUpPage() {
                 <button
                   type="submit"
                   disabled={isVerifying || verificationCode.length !== 6}
-                  className="w-full py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isVerifying ? "Doğrulanıyor..." : "Hesabı Oluştur"}
                 </button>

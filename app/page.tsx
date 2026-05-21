@@ -49,7 +49,7 @@ function HomeContent() {
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-[#2B0510]">
       {/* Hero Section */}
-      <div className="bg-linear-to-b from-[#FFE5B4]/30 via-[#FFF9F0] to-[#FFFDF9] py-16 sm:py-24 lg:py-28 relative overflow-hidden">
+      <div className="bg-linear-to-b from-[#FFE5B4]/30 via-[#FFF9F0] to-[#FFFDF9] py-16 pt-12 sm:pt-16 lg:pt-20 sm:py-24 lg:py-28 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFE5B4]/20 rounded-full blur-3xl -z-10"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#7B1B38]/5 rounded-full blur-3xl -z-10"></div>
         
