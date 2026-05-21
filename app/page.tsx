@@ -3,13 +3,13 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Briefcase, BookOpen, Users, Search, GraduationCap, Award, Compass, ArrowRight, DollarSign, CheckCircle2 } from "lucide-react"
 
-export default function Home() {
+export default function Home({ searchParams }: { searchParams?: { search?: string } }) {
   const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState(searchParams?.search || "")
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +44,8 @@ export default function Home() {
       slug: "bezos-scholars-program",
       badge: "Liderlik",
     },
-  ]
+  ];
+
 
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-[#2B0510]">

@@ -37,6 +37,7 @@ export default async function AdminDashboard() {
     VOLUNTEER: "Gönüllülük",
     SUMMER_PROGRAM: "Yaz Programı",
     SCHOOL_PROGRAM: "Okul Programı",
+    PLATFORM: "Platform",
   }
 
   return (

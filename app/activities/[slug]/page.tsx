@@ -32,6 +32,7 @@ export default async function ActivityDetailPage({
     SUMMER_PROGRAM: "Yaz Programı",
     SCHOOL_PROGRAM: "Okul Programı",
     SCHOLARSHIP: "Burs",
+    PLATFORM: "Platform",
   }
 
   const seasonLabels = {
