@@ -78,6 +78,9 @@ model Activity {
   category        ActivityCategory
   gradeLevels     Int[]
   financialSupport String
+  entryPrice        Decimal?        @db.Decimal(12, 2)
+  scholarshipAmount Decimal?        @db.Decimal(12, 2)
+  amountCurrency    String          @default("TRY")
   isPrestigious   Boolean          @default(false)
   isClosed        Boolean          @default(false)
   season          ActivitySeason

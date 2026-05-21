@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { ActivityCategory } from "@prisma/client"
 import Link from "next/link"
+import { formatAmount } from "@/lib/format-amount"
 
 export default async function ActivityDetailPage({
   params,
@@ -150,12 +151,49 @@ export default async function ActivityDetailPage({
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Maddi Destek</p>
-                  <p className="font-bold text-sm">
-                    {financialLabels[activity.financialSupport] || activity.financialSupport}
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">
+                    {activity.category === "SCHOLARSHIP"
+                      ? "Burs Miktarı"
+                      : "Maddi Destek"}
                   </p>
+                  <p className="font-bold text-sm">
+                    {activity.scholarshipAmount != null
+                      ? formatAmount(
+                          activity.scholarshipAmount,
+                          activity.amountCurrency
+                        )
+                      : financialLabels[activity.financialSupport] ||
+                        activity.financialSupport}
+                  </p>
+                  {activity.scholarshipAmount != null && (
+                    <p className="text-xs text-[#7A696C] mt-0.5">
+                      {financialLabels[activity.financialSupport] ||
+                        activity.financialSupport}
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {activity.entryPrice != null && (
+                <div className="flex items-center gap-3 text-[#2B0510]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">
+                      Katılım Ücreti
+                    </p>
+                    <p className="font-bold text-sm">
+                      {Number(activity.entryPrice) === 0
+                        ? "Ücretsiz"
+                        : formatAmount(
+                            activity.entryPrice,
+                            activity.amountCurrency
+                          )}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-3 text-[#2B0510]">
                 <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
+import { formatAmount } from "@/lib/format-amount"
 import { Search, Filter, Calendar, MapPin, GraduationCap, DollarSign, Award, ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
 
 export const metadata = {
@@ -230,7 +231,13 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
 
                     {/* Support Amount badge */}
                     <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-[#FFE5B4]/30 text-[#7B1B38] text-xs font-bold">
-                      <DollarSign className="w-3 h-3" /> {getFinancialSupportLabel(scholarship.financialSupport)}
+                      <DollarSign className="w-3 h-3" />{" "}
+                      {scholarship.scholarshipAmount != null
+                        ? formatAmount(
+                            scholarship.scholarshipAmount,
+                            scholarship.amountCurrency
+                          )
+                        : getFinancialSupportLabel(scholarship.financialSupport)}
                     </span>
                   </div>
 

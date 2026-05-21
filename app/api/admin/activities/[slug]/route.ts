@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
+import { parseAmount } from "@/lib/format-amount"
 
 export async function GET(
   req: NextRequest,
@@ -59,6 +60,9 @@ export async function PUT(
         category: data.category,
         gradeLevels: data.gradeLevels,
         financialSupport: data.financialSupport,
+        entryPrice: parseAmount(data.entryPrice),
+        scholarshipAmount: parseAmount(data.scholarshipAmount),
+        amountCurrency: data.amountCurrency || "TRY",
         isPrestigious: data.isPrestigious,
         season: data.season,
         duration: data.duration,

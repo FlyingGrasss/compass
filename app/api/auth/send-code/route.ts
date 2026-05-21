@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
         subject: "E-posta Doğrulama Kodu",
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #242F50;">Hoş geldiniz, ${name}!</h2>
-            <p style="color: #242F50;">E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın:</p>
-            <div style="background: #E6F1FB; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-              <span style="font-size: 32px; font-weight: bold; color: #2458B4; letter-spacing: 8px;">${verificationCode}</span>
+            <h2 style="color: #7B1B38;">Hoş geldiniz, ${name}!</h2>
+            <p style="color: #2B0510;">E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın:</p>
+            <div style="background: #FFE5B4; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; border: 1px solid #F1E2D9;">
+              <span style="font-size: 32px; font-weight: bold; color: #7B1B38; letter-spacing: 8px;">${verificationCode}</span>
             </div>
-            <p style="color: #242F50; font-size: 14px;">Bu kod 10 dakika geçerlidir.</p>
+            <p style="color: #2B0510; font-size: 14px;">Bu kod 10 dakika geçerlidir.</p>
           </div>
         `,
       })

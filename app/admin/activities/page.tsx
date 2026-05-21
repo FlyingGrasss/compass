@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import type { Activity } from "@prisma/client"
+import { formatAmount } from "@/lib/format-amount"
 
 export default function AdminActivitiesPage() {
   const router = useRouter()
@@ -81,7 +82,7 @@ export default function AdminActivitiesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-100">
-        <div className="text-[#242F50]/70">Yükleniyor...</div>
+        <div className="text-[#2B0510]/70">Yükleniyor...</div>
       </div>
     )
   }
@@ -89,12 +90,12 @@ export default function AdminActivitiesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#242F50]">
+        <h1 className="text-3xl font-bold text-[#2B0510]">
           Etkinlikleri Yönet
         </h1>
         <Link
           href="/admin/activities/new"
-          className="flex items-center gap-2 px-4 py-2 bg-[#2458B4] text-white rounded-lg hover:bg-[#1d4a95] transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 bg-[#7B1B38] text-white rounded-lg hover:bg-[#5A1127] transition-colors cursor-pointer"
         >
           <Plus className="w-5 h-5" />
           Yeni Etkinlik Ekle
@@ -104,19 +105,19 @@ export default function AdminActivitiesPage() {
       <div className="bg-white rounded-lg shadow p-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#242F50]/40" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2B0510]/40" />
             <input
               type="text"
               placeholder="Etkinlik ara..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full pl-10 pr-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
             />
           </div>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] cursor-pointer"
+            className="px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
           >
             <option value="ALL">Tüm Kategoriler</option>
             <option value="COMPETITION">Yarışmalar</option>
@@ -130,7 +131,7 @@ export default function AdminActivitiesPage() {
 
       {filteredActivities.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-[#242F50]/70">
+          <p className="text-[#2B0510]/70">
             {searchQuery || categoryFilter !== "ALL"
               ? "Sonuç bulunamadı"
               : "Henüz etkinlik yok. İlk etkinliğinizi oluşturun!"}
@@ -151,42 +152,56 @@ export default function AdminActivitiesPage() {
                 />
               )}
               {!activity.imageUrl && (
-                <div className="w-full h-48 bg-[#AAD0F2] flex items-center justify-center">
-                  <span className="text-[#242F50]/40 text-sm">
+                <div className="w-full h-48 bg-[#FFE5B4] flex items-center justify-center">
+                  <span className="text-[#2B0510]/40 text-sm">
                     Görsel yok
                   </span>
                 </div>
               )}
               <div className="p-6 space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-[#242F50] mb-1">
+                  <h3 className="text-lg font-bold text-[#2B0510] mb-1">
                     {activity.name}
                   </h3>
-                  <p className="text-sm text-[#242F50]/70">/{activity.slug}</p>
+                  <p className="text-sm text-[#2B0510]/70">/{activity.slug}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#AAD0F2] text-[#242F50]">
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#FFE5B4] text-[#2B0510]">
                     {categoryLabels[activity.category]}
                   </span>
                   {activity.isPrestigious && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#2458B4] text-white">
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#7B1B38] text-white">
                       Prestijli
                     </span>
                   )}
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#E6F1FB] text-[#242F50]">
-                    {activity.financialSupport}
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#F9EFE6] text-[#2B0510]">
+                    {activity.scholarshipAmount != null
+                      ? formatAmount(
+                          activity.scholarshipAmount,
+                          activity.amountCurrency
+                        )
+                      : activity.financialSupport}
+                    {activity.entryPrice != null &&
+                      ` · Ücret: ${
+                        Number(activity.entryPrice) === 0
+                          ? "Ücretsiz"
+                          : formatAmount(
+                              activity.entryPrice,
+                              activity.amountCurrency
+                            )
+                      }`}
                   </span>
                 </div>
 
-                <p className="text-sm text-[#242F50]/70 line-clamp-2">
+                <p className="text-sm text-[#2B0510]/70 line-clamp-2">
                   {activity.description}
                 </p>
 
                 <div className="flex gap-2 pt-2">
                   <Link
                     href={`/admin/activities/${activity.slug}/edit`}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#2458B4] text-white rounded-lg hover:bg-[#1d4a95] transition-colors cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#7B1B38] text-white rounded-lg hover:bg-[#5A1127] transition-colors cursor-pointer"
                   >
                     <Edit className="w-4 h-4" />
                     Düzenle

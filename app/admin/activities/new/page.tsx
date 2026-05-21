@@ -17,6 +17,9 @@ export default function NewActivityPage() {
     category: "COMPETITION" as ActivityCategory,
     gradeLevels: [] as number[],
     financialSupport: "B",
+    entryPrice: "",
+    scholarshipAmount: "",
+    amountCurrency: "TRY",
     isPrestigious: false,
     season: "YEAR_ROUND" as ActivitySeason,
     duration: "",
@@ -88,14 +91,14 @@ export default function NewActivityPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-3xl font-bold text-[#242F50] mb-6">
+      <h1 className="text-3xl font-bold text-[#2B0510] mb-6">
         Yeni Etkinlik Ekle
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
               Etkinlik Adı *
             </label>
             <input
@@ -104,16 +107,16 @@ export default function NewActivityPage() {
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
               required
             />
-            <p className="mt-1 text-sm text-[#242F50]/70">
+            <p className="mt-1 text-sm text-[#2B0510]/70">
               Slug otomatik oluşturulacak: {generateSlug(formData.name)}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
               Açıklama *
             </label>
             <textarea
@@ -122,14 +125,14 @@ export default function NewActivityPage() {
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={6}
-              className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 Kategori *
               </label>
               <select
@@ -140,7 +143,7 @@ export default function NewActivityPage() {
                     category: e.target.value as ActivityCategory,
                   })
                 }
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] cursor-pointer"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
                 required
               >
                 <option value="COMPETITION">Yarışma</option>
@@ -152,7 +155,7 @@ export default function NewActivityPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 Dönem *
               </label>
               <select
@@ -163,7 +166,7 @@ export default function NewActivityPage() {
                     season: e.target.value as ActivitySeason,
                   })
                 }
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] cursor-pointer"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
                 required
               >
                 <option value="SUMMER">Yaz</option>
@@ -176,7 +179,7 @@ export default function NewActivityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-2">
+            <label className="block text-sm font-medium text-[#2B0510] mb-2">
               Sınıf Seviyeleri *
             </label>
             <div className="flex flex-wrap gap-2">
@@ -187,8 +190,8 @@ export default function NewActivityPage() {
                   onClick={() => toggleGradeLevel(level)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     formData.gradeLevels.includes(level)
-                      ? "bg-[#2458B4] text-white"
-                      : "bg-[#E6F1FB] text-[#242F50] hover:bg-[#AAD0F2]"
+                      ? "bg-[#7B1B38] text-white"
+                      : "bg-[#F9EFE6] text-[#2B0510] hover:bg-[#FFE5B4]"
                   }`}
                 >
                   {level}. Sınıf
@@ -199,8 +202,8 @@ export default function NewActivityPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
-                Finansal Destek *
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+                Finansal Destek Kategorisi *
               </label>
               <select
                 value={formData.financialSupport}
@@ -210,7 +213,7 @@ export default function NewActivityPage() {
                     financialSupport: e.target.value,
                   })
                 }
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] cursor-pointer"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
                 required
               >
                 <option value="A+">A+ (Tam Burslu)</option>
@@ -219,10 +222,78 @@ export default function NewActivityPage() {
                 <option value="C">C (Sınırlı Burs)</option>
                 <option value="D">D (Burssuz)</option>
               </select>
+              <p className="mt-1 text-xs text-[#2B0510]/60">
+                Genel burs/ödül seviyesi (A+ en yüksek)
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+                Para Birimi
+              </label>
+              <select
+                value={formData.amountCurrency}
+                onChange={(e) =>
+                  setFormData({ ...formData, amountCurrency: e.target.value })
+                }
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
+              >
+                <option value="TRY">TRY (₺)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+                Burs Miktarı
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.scholarshipAmount}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    scholarshipAmount: e.target.value,
+                  })
+                }
+                placeholder="örn. 25000"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+              <p className="mt-1 text-xs text-[#2B0510]/60">
+                Burslar için tahmini veya maksimum tutar
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+                Katılım Ücreti / Fiyat
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.entryPrice}
+                onChange={(e) =>
+                  setFormData({ ...formData, entryPrice: e.target.value })
+                }
+                placeholder="0 = ücretsiz"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+              <p className="mt-1 text-xs text-[#2B0510]/60">
+                Yarışma, program veya platform için ücret (boş = belirtilmedi)
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 Süre *
               </label>
               <input
@@ -232,7 +303,7 @@ export default function NewActivityPage() {
                   setFormData({ ...formData, duration: e.target.value })
                 }
                 placeholder="örn. 2 hafta, 1 ay"
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
                 required
               />
             </div>
@@ -246,11 +317,11 @@ export default function NewActivityPage() {
               onChange={(e) =>
                 setFormData({ ...formData, isPrestigious: e.target.checked })
               }
-              className="w-5 h-5 rounded border-2 border-[#242F50]/20 text-[#2458B4] focus:ring-[#2458B4] cursor-pointer"
+              className="w-5 h-5 rounded border-2 border-[#2B0510]/20 text-[#7B1B38] focus:ring-[#7B1B38] cursor-pointer"
             />
             <label
               htmlFor="prestigious"
-              className="text-sm font-medium text-[#242F50] cursor-pointer"
+              className="text-sm font-medium text-[#2B0510] cursor-pointer"
             >
               Prestijli/Yüksek Rekabet Olarak İşaretle
             </label>
@@ -258,7 +329,7 @@ export default function NewActivityPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 Son Başvuru Tarihi
               </label>
               <input
@@ -267,12 +338,12 @@ export default function NewActivityPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, deadline: e.target.value })
                 }
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50] cursor-pointer"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] cursor-pointer"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+              <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 Konum
               </label>
               <input
@@ -282,13 +353,13 @@ export default function NewActivityPage() {
                   setFormData({ ...formData, location: e.target.value })
                 }
                 placeholder="örn. Online, İstanbul, ABD"
-                className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
               Gereksinimler
             </label>
             <textarea
@@ -298,12 +369,12 @@ export default function NewActivityPage() {
               }
               rows={4}
               placeholder="Uygunluk kriterleri, ön koşullar vs."
-              className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
               Website URL
             </label>
             <input
@@ -313,12 +384,12 @@ export default function NewActivityPage() {
                 setFormData({ ...formData, website: e.target.value })
               }
               placeholder="https://example.com"
-              className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#242F50] mb-1.5">
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
               Görsel URL
             </label>
             <input
@@ -328,7 +399,7 @@ export default function NewActivityPage() {
                 setFormData({ ...formData, imageUrl: e.target.value })
               }
               placeholder="https://example.com/image.jpg"
-              className="w-full px-4 py-3 bg-[#E6F1FB] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#2458B4] transition-colors text-[#242F50]"
+              className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
             />
           </div>
         </div>
@@ -337,14 +408,14 @@ export default function NewActivityPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-3 bg-[#2458B4] hover:bg-[#1d4a95] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-6 py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? "Oluşturuluyor..." : "Etkinlik Oluştur"}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-3 bg-white text-[#242F50] font-medium rounded-lg border-2 border-[#242F50]/20 hover:border-[#242F50]/40 transition-colors cursor-pointer"
+            className="px-6 py-3 bg-white text-[#2B0510] font-medium rounded-lg border-2 border-[#2B0510]/20 hover:border-[#2B0510]/40 transition-colors cursor-pointer"
           >
             İptal
           </button>
