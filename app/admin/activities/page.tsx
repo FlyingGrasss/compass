@@ -124,6 +124,7 @@ export default function AdminActivitiesPage() {
             <option value="VOLUNTEER">Gönüllülük</option>
             <option value="SUMMER_PROGRAM">Yaz Programları</option>
             <option value="SCHOOL_PROGRAM">Okul Programları</option>
+            <option value="SCHOLARSHIP">Burslar</option>
             <option value="PLATFORM">Platformlar</option>
           </select>
         </div>
@@ -139,83 +140,96 @@ export default function AdminActivitiesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredActivities.map((activity) => (
-            <div
-              key={activity.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden"
-            >
-              {activity.imageUrl && (
-                <img
-                  src={activity.imageUrl}
-                  alt={activity.name}
-                  className="w-full h-48 object-cover"
-                />
-              )}
-              {!activity.imageUrl && (
-                <div className="w-full h-48 bg-[#FFE5B4] flex items-center justify-center">
-                  <span className="text-[#2B0510]/40 text-sm">
-                    Görsel yok
-                  </span>
-                </div>
-              )}
-              <div className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-lg font-bold text-[#2B0510] mb-1">
-                    {activity.name}
-                  </h3>
-                  <p className="text-sm text-[#2B0510]/70">/{activity.slug}</p>
-                </div>
+          {filteredActivities.map((activity) => {
+            const categoryColors: Record<string, string> = {
+              COMPETITION: "bg-[#FFF9E6] text-[#D4AF37] border border-[#D4AF37]/30",
+              VOLUNTEER: "bg-[#EAF5F0] text-[#4E8D70] border border-[#4E8D70]/30",
+              SUMMER_PROGRAM: "bg-[#FDF2F0] text-[#E07A5F] border border-[#E07A5F]/30",
+              SCHOOL_PROGRAM: "bg-[#F0F3FD] text-[#5F7CE0] border border-[#5F7CE0]/30",
+              SCHOLARSHIP: "bg-[#FDF0F3] text-[#D16C82] border border-[#D16C82]/30",
+              PLATFORM: "bg-[#EBF7F8] text-[#3C9199] border border-[#3C9199]/30",
+            }
 
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#FFE5B4] text-[#2B0510]">
-                    {categoryLabels[activity.category]}
-                  </span>
-                  {activity.isPrestigious && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#7B1B38] text-white">
-                      Prestijli
-                    </span>
+            return (
+              <div
+                key={activity.id}
+                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
+              >
+                <div>
+                  {activity.imageUrl && (
+                    <img
+                      src={activity.imageUrl}
+                      alt={activity.name}
+                      className="w-full h-48 object-cover"
+                    />
                   )}
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#F9EFE6] text-[#2B0510]">
-                    {activity.scholarshipAmount != null
-                      ? formatAmount(
-                          activity.scholarshipAmount,
-                          activity.amountCurrency
-                        )
-                      : activity.financialSupport}
-                    {activity.entryPrice != null &&
-                      ` · Ücret: ${
-                        Number(activity.entryPrice) === 0
-                          ? "Ücretsiz"
-                          : formatAmount(
-                              activity.entryPrice,
+                  {!activity.imageUrl && (
+                    <div className="w-full h-48 bg-[#FFE5B4]/30 flex items-center justify-center border-b border-[#FFE5B4]/20">
+                      <span className="text-[#2B0510]/40 text-sm font-semibold">
+                        Görsel yok
+                      </span>
+                    </div>
+                  )}
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#2B0510] mb-1 line-clamp-1">
+                        {activity.name}
+                      </h3>
+                      <p className="text-xs text-[#2B0510]/60">/{activity.slug}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${categoryColors[activity.category] || "bg-[#FFE5B4] text-[#2B0510]"}`}>
+                        {categoryLabels[activity.category]}
+                      </span>
+                      {activity.isPrestigious && (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#7B1B38] text-white">
+                          Prestijli
+                        </span>
+                      )}
+                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#F9EFE6] text-[#2B0510]">
+                        {activity.scholarshipAmount != null
+                          ? formatAmount(
+                              activity.scholarshipAmount,
                               activity.amountCurrency
                             )
-                      }`}
-                  </span>
-                </div>
+                          : activity.financialSupport}
+                        {activity.entryPrice != null &&
+                          ` · Ücret: ${
+                            Number(activity.entryPrice) === 0
+                              ? "Ücretsiz"
+                              : formatAmount(
+                                  activity.entryPrice,
+                                  activity.amountCurrency
+                                )
+                          }`}
+                      </span>
+                    </div>
 
-                <p className="text-sm text-[#2B0510]/70 line-clamp-2">
-                  {activity.description}
-                </p>
+                    <p className="text-sm text-[#2B0510]/70 line-clamp-2">
+                      {activity.description}
+                    </p>
 
-                <div className="flex gap-2 pt-2">
-                  <Link
-                    href={`/admin/activities/${activity.slug}/edit`}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#7B1B38] text-white rounded-lg hover:bg-[#5A1127] transition-colors cursor-pointer"
-                  >
-                    <Edit className="w-4 h-4" />
-                    Düzenle
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(activity.slug)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <div className="flex gap-2 pt-2">
+                      <Link
+                        href={`/admin/activities/${activity.slug}/edit`}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#7B1B38] text-white rounded-lg hover:bg-[#5A1127] transition-colors cursor-pointer"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Düzenle
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(activity.slug)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

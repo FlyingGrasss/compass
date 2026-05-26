@@ -204,6 +204,8 @@ export default function EditActivityPage() {
                 <option value="COMPETITION">Yarışma</option>
                 <option value="VOLUNTEER">Gönüllülük</option>
                 <option value="SUMMER_PROGRAM">Yaz Programı</option>
+                <option value="SCHOOL_PROGRAM">Okul Programı</option>
+                <option value="SCHOLARSHIP">Burs</option>
                 <option value="PLATFORM">Platform</option>
               </select>
             </div>
