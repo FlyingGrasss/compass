@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
-import { Calendar, MapPin, Award, Search, Filter, RefreshCw, Sparkles } from "lucide-react"
+import { Calendar, MapPin, Award, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
 import { ActivityCategory, ActivitySeason } from "@prisma/client"
 
 export const metadata = {
@@ -18,6 +18,7 @@ interface PageProps {
     grade?: string
     prestigious?: string
     status?: string
+    sort?: string
   }>
 }
 
@@ -29,6 +30,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   const gradeFilter = resolvedSearchParams.grade || "ALL"
   const prestigiousFilter = resolvedSearchParams.prestigious || "ALL"
   const statusFilter = resolvedSearchParams.status || "ALL"
+  const sortOption = resolvedSearchParams.sort || "deadline_asc"
 
   // Build Prisma query
   const whereClause: any = {}
@@ -81,6 +83,33 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     console.error("Database fetch error in ActivitiesPage:", error)
   }
 
+  // Smart Sorting: prioritizing active upcoming deadlines
+  const now = new Date()
+
+  activities.sort((a, b) => {
+    if (sortOption === "newest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+
+    const aClosed = a.isClosed || (a.deadline && new Date(a.deadline) < now)
+    const bClosed = b.isClosed || (b.deadline && new Date(b.deadline) < now)
+
+    if (aClosed !== bClosed) {
+      return aClosed ? 1 : -1 // Active/open ones first
+    }
+
+    if (a.deadline && b.deadline) {
+      const timeA = new Date(a.deadline).getTime()
+      const timeB = new Date(b.deadline).getTime()
+      return sortOption === "deadline_desc" ? timeB - timeA : timeA - timeB
+    }
+
+    if (a.deadline) return -1
+    if (b.deadline) return 1
+
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
   const categoryLabels: Record<string, string> = {
     COMPETITION: "Yarışma",
     VOLUNTEER: "Gönüllülük",
@@ -104,7 +133,32 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     seasonFilter !== "ALL" ||
     gradeFilter !== "ALL" ||
     prestigiousFilter !== "ALL" ||
-    statusFilter !== "ALL"
+    statusFilter !== "ALL" ||
+    sortOption !== "deadline_asc"
+
+  const getDeadlineInfo = (deadlineStr?: string | Date, isClosed?: boolean) => {
+    if (isClosed) {
+      return { label: "Başvurular Kapandı", color: "bg-gray-200 text-gray-700", isExpired: true }
+    }
+    if (!deadlineStr) {
+      return { label: "Sürekli / Açık", color: "bg-emerald-100 text-emerald-800", isExpired: false }
+    }
+    const deadline = new Date(deadlineStr)
+    const diffTime = deadline.getTime() - Date.now()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays < 0) {
+      return { label: "Süresi Doldu", color: "bg-gray-200 text-gray-700", isExpired: true }
+    } else if (diffDays === 0) {
+      return { label: "🔥 Bugüne Özel!", color: "bg-red-600 text-white animate-pulse font-extrabold", isExpired: false }
+    } else if (diffDays <= 7) {
+      return { label: `⚡ Son ${diffDays} Gün!`, color: "bg-rose-500 text-white font-black animate-pulse", isExpired: false }
+    } else if (diffDays <= 30) {
+      return { label: `⏳ Son ${diffDays} Gün`, color: "bg-amber-500 text-white font-bold", isExpired: false }
+    } else {
+      return { label: `📅 ${deadline.toLocaleDateString("tr-TR")}`, color: "bg-sky-100 text-sky-900 font-bold", isExpired: false }
+    }
+  }
 
   return (
     <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] via-[#FFF9F0] to-[#FFFDF9] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
@@ -118,7 +172,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             Tüm Fırsatlar & Etkinlikler
           </h1>
           <p className="text-base sm:text-lg text-[#2B0510]/75 max-w-2xl mx-auto font-medium">
-            İlgi alanlarınıza, sınıf seviyenize ve hedeflerinize uygun en güncel fırsatları filtreleyin.
+            Başvuru tarihleri yaklaşan fırsatları öncelikli olarak keşfedin ve hayalinizdeki programa zamanında başvurun.
           </p>
         </div>
 
@@ -138,7 +192,23 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             </div>
 
             {/* Filter Dropdowns Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+              {/* Sort Option */}
+              <div>
+                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1 flex items-center gap-1">
+                  <ArrowUpDown className="w-3 h-3" /> Sıralama
+                </label>
+                <select
+                  name="sort"
+                  defaultValue={sortOption}
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#7B1B38]/30 rounded-xl text-xs sm:text-sm font-bold text-[#7B1B38] outline-none cursor-pointer"
+                >
+                  <option value="deadline_asc">⏰ Yaklaşan Son Başvuru</option>
+                  <option value="newest">✨ En Yeni Ekleme</option>
+                  <option value="deadline_desc">📅 İleri Tarihli</option>
+                </select>
+              </div>
+
               {/* Category */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
@@ -241,7 +311,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                     href="/activities"
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2B0510] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" /> Filtereleri Temizle
+                    <RefreshCw className="w-3.5 h-3.5" /> Filtreleri Temizle
                   </Link>
                 )}
                 <button
@@ -273,78 +343,89 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map((activity) => (
-              <Link
-                key={activity.id}
-                href={`/activities/${activity.slug}`}
-                className="bg-white rounded-2xl border border-[#F1E2D9] shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5"
-              >
-                {activity.imageUrl ? (
-                  <img
-                    src={activity.imageUrl}
-                    alt={activity.name}
-                    className="w-full h-40 sm:h-48 object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-40 sm:h-48 bg-[#FFE5B4]/30 flex items-center justify-center">
-                    <Award className="w-12 h-12 text-[#7B1B38]" />
-                  </div>
-                )}
+            {activities.map((activity) => {
+              const deadlineInfo = getDeadlineInfo(activity.deadline, activity.isClosed)
+              return (
+                <Link
+                  key={activity.id}
+                  href={`/activities/${activity.slug}`}
+                  className={`bg-white rounded-2xl border shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5 relative ${
+                    deadlineInfo.isExpired ? "opacity-75 border-gray-200" : "border-[#F1E2D9]"
+                  }`}
+                >
+                  {/* Image & Badges Overlay */}
+                  <div className="relative">
+                    {activity.imageUrl ? (
+                      <img
+                        src={activity.imageUrl}
+                        alt={activity.name}
+                        className="w-full h-40 sm:h-48 object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-40 sm:h-48 bg-[#FFE5B4]/30 flex items-center justify-center">
+                        <Award className="w-12 h-12 text-[#7B1B38]" />
+                      </div>
+                    )}
 
-                <div className="p-6 space-y-4 flex-1 flex flex-col">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-lg font-bold text-[#2B0510] line-clamp-2">
-                        {activity.name}
-                      </h3>
+                    {/* Top Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex justify-between items-center gap-2">
+                      <span className={`px-3 py-1.5 text-xs rounded-full shadow-md backdrop-blur-md ${deadlineInfo.color}`}>
+                        {deadlineInfo.label}
+                      </span>
                       {activity.isPrestigious && (
-                        <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-[#7B1B38] text-[#FFFDF9] whitespace-nowrap shrink-0 uppercase tracking-wider">
+                        <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-[#7B1B38] text-[#FFFDF9] whitespace-nowrap shrink-0 uppercase tracking-wider shadow-sm">
                           Prestijli
                         </span>
                       )}
                     </div>
+                  </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
-                        {categoryLabels[activity.category] || activity.category}
-                      </span>
-                      {activity.season && (
-                        <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 text-[#2B0510]/80">
-                          {seasonLabels[activity.season] || activity.season}
+                  <div className="p-6 space-y-4 flex-1 flex flex-col">
+                    <div className="flex-1 space-y-2">
+                      <h3 className="text-lg font-bold text-[#2B0510] line-clamp-2">
+                        {activity.name}
+                      </h3>
+
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
+                          {categoryLabels[activity.category] || activity.category}
                         </span>
-                      )}
+                        {activity.season && (
+                          <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 text-[#2B0510]/80">
+                            {seasonLabels[activity.season] || activity.season}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-[#2B0510]/85 line-clamp-3 leading-relaxed font-medium pt-1">
+                        {activity.description}
+                      </p>
                     </div>
 
-                    <p className="text-sm text-[#2B0510]/85 line-clamp-3 leading-relaxed font-medium pt-1">
-                      {activity.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 text-xs text-[#2B0510]/75 pt-4 border-t border-[#F1E2D9]">
-                    {activity.location && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 shrink-0 text-[#7B1B38]" />
-                        <span className="truncate">{activity.location}</span>
-                      </div>
-                    )}
-                    {activity.deadline && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 shrink-0 text-[#7B1B38]" />
-                        <span className="font-semibold">
-                          Son Başvuru: {new Date(activity.deadline).toLocaleDateString("tr-TR")}
+                    <div className="space-y-2 text-xs text-[#2B0510]/75 pt-4 border-t border-[#F1E2D9]">
+                      {activity.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 shrink-0 text-[#7B1B38]" />
+                          <span className="truncate">{activity.location}</span>
+                        </div>
+                      )}
+                      <div className={`flex items-center gap-2 p-2 rounded-lg ${deadlineInfo.isExpired ? "bg-gray-100 text-gray-600" : "bg-[#FFF9F0] text-[#7B1B38]"}`}>
+                        <Clock className="w-4 h-4 shrink-0" />
+                        <span className="font-bold">
+                          Son Başvuru: {activity.deadline ? new Date(activity.deadline).toLocaleDateString("tr-TR") : "Belirtilmedi / Sürekli"}
                         </span>
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 mt-auto">
-                    <span className="text-[#7B1B38] font-bold text-sm">
-                      Detayları Gör →
-                    </span>
+                    <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 mt-auto">
+                      <span className="text-[#7B1B38] font-bold text-sm">
+                        Detayları Gör →
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         )}
       </div>
