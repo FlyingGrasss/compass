@@ -11,12 +11,19 @@ function HomeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "")
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "ALL")
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    const params = new URLSearchParams()
     if (searchQuery.trim()) {
-      router.push(`/activities?search=${encodeURIComponent(searchQuery)}`)
+      params.set('search', searchQuery.trim())
     }
+    if (selectedCategory && selectedCategory !== "ALL") {
+      params.set('category', selectedCategory)
+    }
+    const queryString = params.toString()
+    router.push(`/activities${queryString ? `?${queryString}` : ''}`)
   }
 
   const highlights = [
@@ -71,8 +78,21 @@ function HomeContent() {
             </div>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+            <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-2 bg-white rounded-2xl shadow-xl border border-[#F1E2D9] p-2 hover:shadow-2xl transition-all">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-4 py-3 bg-[#FFF9F0] border-r border-[#F1E2D9] rounded-xl text-[#7B1B38] font-bold text-sm outline-none cursor-pointer"
+                >
+                  <option value="ALL">Tüm Kategoriler</option>
+                  <option value="COMPETITION">Yarışmalar</option>
+                  <option value="VOLUNTEER">Gönüllülük</option>
+                  <option value="SUMMER_PROGRAM">Yaz Programları</option>
+                  <option value="SCHOOL_PROGRAM">Okul Programları</option>
+                  <option value="SCHOLARSHIP">Burslar</option>
+                  <option value="PLATFORM">Platformlar</option>
+                </select>
                 <input
                   type="text"
                   value={searchQuery}
