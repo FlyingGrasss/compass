@@ -158,10 +158,7 @@ export default async function ActivityDetailPage({
                   </p>
                   <p className="font-bold text-sm">
                     {activity.scholarshipAmount != null
-                      ? formatAmount(
-                          activity.scholarshipAmount,
-                          activity.amountCurrency
-                        )
+                      ? activity.scholarshipAmount
                       : financialLabels[activity.financialSupport] ||
                         activity.financialSupport}
                   </p>

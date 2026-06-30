@@ -189,10 +189,7 @@ export default function AdminActivitiesPage() {
                       )}
                       <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#F9EFE6] text-[#2B0510]">
                         {activity.scholarshipAmount != null
-                          ? formatAmount(
-                              activity.scholarshipAmount,
-                              activity.amountCurrency
-                            )
+                          ? activity.scholarshipAmount
                           : activity.financialSupport}
                         {activity.entryPrice != null &&
                           ` · Ücret: ${

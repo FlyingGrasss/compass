@@ -10,7 +10,7 @@ export type CompetitionSeed = {
   gradeLevels: number[]
   financialSupport: string
   entryPrice?: number | null
-  scholarshipAmount?: number | null
+  scholarshipAmount?: number | string | null
   amountCurrency?: string
   isPrestigious: boolean
   isClosed: boolean

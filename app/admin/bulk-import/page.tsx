@@ -30,7 +30,7 @@ interface ParsedActivity {
   gradeLevels?: number[]
   financialSupport?: string
   entryPrice?: number
-  scholarshipAmount?: number
+  scholarshipAmount?: number | string
   amountCurrency?: string
   isPrestigious?: boolean
   season?: string
@@ -91,7 +91,7 @@ financialSupport skalası:
     "gradeLevels": [9, 10, 11, 12],
     "financialSupport": "A+" | "A" | "B" | "C" | "D",
     "entryPrice": 0,
-    "scholarshipAmount": 25000,
+    "scholarshipAmount": "Tam burs + yasam gideri",
     "amountCurrency": "USD" | "TRY" | "EUR",
     "isPrestigious": true | false,
     "isClosed": false,
@@ -114,7 +114,7 @@ Gerçek örnek (bu formatı birebir taklit et):
     "gradeLevels": [8, 9, 10, 11, 12],
     "financialSupport": "A",
     "entryPrice": 0,
-    "scholarshipAmount": 25000,
+    "scholarshipAmount": "$25,000",
     "amountCurrency": "USD",
     "isPrestigious": true,
     "isClosed": false,

@@ -37,8 +37,8 @@ export default function SignInPage() {
             toast.success("Başarıyla giriş yapıldı!")
             router.push("/profile")
           },
-          onError: (ctx) => {
-            toast.error(ctx.error.message || "Giriş yapılamadı")
+          onError: () => {
+            toast.error("E-posta veya şifre hatalı")
           },
         }
       )

@@ -61,7 +61,10 @@ export async function PUT(
         gradeLevels: data.gradeLevels,
         financialSupport: data.financialSupport,
         entryPrice: parseAmount(data.entryPrice),
-        scholarshipAmount: parseAmount(data.scholarshipAmount),
+        scholarshipAmount:
+          data.scholarshipAmount === "" || data.scholarshipAmount == null
+            ? null
+            : String(data.scholarshipAmount),
         amountCurrency: data.amountCurrency || "TRY",
         isPrestigious: data.isPrestigious,
         season: data.season,

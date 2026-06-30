@@ -486,7 +486,8 @@ async function main() {
         gradeLevels: entry.gradeLevels,
         financialSupport: entry.financialSupport,
         entryPrice: entry.entryPrice ?? null,
-        scholarshipAmount: entry.scholarshipAmount ?? null,
+        scholarshipAmount:
+          entry.scholarshipAmount != null ? String(entry.scholarshipAmount) : null,
         amountCurrency: entry.amountCurrency ?? "TRY",
         isPrestigious: entry.isPrestigious,
         isClosed: entry.isClosed,
@@ -506,7 +507,8 @@ async function main() {
         gradeLevels: entry.gradeLevels,
         financialSupport: entry.financialSupport,
         entryPrice: entry.entryPrice ?? null,
-        scholarshipAmount: entry.scholarshipAmount ?? null,
+        scholarshipAmount:
+          entry.scholarshipAmount != null ? String(entry.scholarshipAmount) : null,
         amountCurrency: entry.amountCurrency ?? "TRY",
         isPrestigious: entry.isPrestigious,
         isClosed: entry.isClosed,

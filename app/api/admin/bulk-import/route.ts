@@ -114,9 +114,8 @@ export async function POST(req: NextRequest) {
         requirements = String(act.requirements).trim()
       }
 
-      // Numerical prices/amounts
+      // Numerical prices
       const entryPrice = act.entryPrice !== undefined && act.entryPrice !== null ? Number(act.entryPrice) : null
-      const scholarshipAmount = act.scholarshipAmount !== undefined && act.scholarshipAmount !== null ? Number(act.scholarshipAmount) : null
 
       const deadline = act.deadline ? new Date(act.deadline) : null
 
@@ -127,7 +126,10 @@ export async function POST(req: NextRequest) {
         gradeLevels,
         financialSupport: String(act.financialSupport || "B").toUpperCase().trim(),
         entryPrice: isNaN(entryPrice as number) ? null : entryPrice,
-        scholarshipAmount: isNaN(scholarshipAmount as number) ? null : scholarshipAmount,
+        scholarshipAmount:
+          act.scholarshipAmount === "" || act.scholarshipAmount == null
+            ? null
+            : String(act.scholarshipAmount),
         amountCurrency: String(act.amountCurrency || "TRY").toUpperCase().trim(),
         isPrestigious: !!act.isPrestigious,
         isClosed: !!act.isClosed,

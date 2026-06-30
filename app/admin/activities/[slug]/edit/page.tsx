@@ -305,9 +305,7 @@ export default function EditActivityPage() {
                 Burs Miktarı
               </label>
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
                 value={formData.scholarshipAmount}
                 onChange={(e) =>
                   setFormData({
