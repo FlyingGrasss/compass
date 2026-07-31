@@ -14,6 +14,7 @@ import {
 import { ActivityCategory } from "@prisma/client"
 import Link from "next/link"
 import { formatAmount } from "@/lib/format-amount"
+import { LocalizedDescription, LocaleText, T } from "@/lib/i18n"
 
 export default async function ActivityDetailPage({
   params,
@@ -28,29 +29,29 @@ export default async function ActivityDetailPage({
     notFound()
   }
 
-  const categoryLabels: Record<ActivityCategory, string> = {
-    COMPETITION: "Yarışma",
-    VOLUNTEER: "Gönüllülük",
-    SUMMER_PROGRAM: "Yaz Programı",
-    SCHOOL_PROGRAM: "Okul Programı",
-    SCHOLARSHIP: "Burs",
-    PLATFORM: "Platform",
+  const categoryLabels: Record<ActivityCategory, { tr: string; en: string }> = {
+    COMPETITION: { tr: "Yarışma", en: "Competition" },
+    VOLUNTEER: { tr: "Gönüllülük", en: "Volunteering" },
+    SUMMER_PROGRAM: { tr: "Yaz Programı", en: "Summer Program" },
+    SCHOOL_PROGRAM: { tr: "Okul Programı", en: "School Program" },
+    SCHOLARSHIP: { tr: "Burs", en: "Scholarship" },
+    PLATFORM: { tr: "Platform", en: "Platform" },
   }
 
   const seasonLabels = {
-    SUMMER: "Yaz",
-    WINTER: "Kış",
-    FALL: "Sonbahar",
-    SPRING: "İlkbahar",
-    YEAR_ROUND: "Yıl Boyunca",
+    SUMMER: { tr: "Yaz", en: "Summer" },
+    WINTER: { tr: "Kış", en: "Winter" },
+    FALL: { tr: "Sonbahar", en: "Fall" },
+    SPRING: { tr: "İlkbahar", en: "Spring" },
+    YEAR_ROUND: { tr: "Yıl Boyunca", en: "Year-round" },
   }
 
-  const financialLabels: Record<string, string> = {
-    "A+": "Tam Burslu (Eğitim + Yaşam)",
-    A: "Büyük Ölçüde Burslu",
-    B: "Kısmen Burslu / Ödül",
-    C: "Sınırlı Burs / Çekiliş",
-    D: "Burssuz",
+  const financialLabels: Record<string, { tr: string; en: string }> = {
+    "A+": { tr: "Tam Burslu (Eğitim + Yaşam)", en: "Fully funded (Education + Living)" },
+    A: { tr: "Büyük Ölçüde Burslu", en: "Mostly funded" },
+    B: { tr: "Kısmen Burslu / Ödül", en: "Partially funded / Award" },
+    C: { tr: "Sınırlı Burs / Çekiliş", en: "Limited funding / Drawing" },
+    D: { tr: "Burssuz", en: "Unfunded" },
   }
 
   return (
@@ -60,7 +61,7 @@ export default async function ActivityDetailPage({
           href="/activities"
           className="inline-flex items-center text-[#7B1B38] font-bold hover:text-[#5A1127] mb-6 cursor-pointer"
         >
-          ← Tüm Fırsatlara Dön
+          <T k="detail.back" />
         </Link>
 
         <div className="bg-white rounded-3xl border border-[#F1E2D9] shadow-xl overflow-hidden">
@@ -76,21 +77,21 @@ export default async function ActivityDetailPage({
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
-                  {categoryLabels[activity.category as ActivityCategory]}
+                  <LocaleText {...categoryLabels[activity.category as ActivityCategory]} />
                 </span>
                 {activity.isPrestigious && (
                   <span className="px-3 py-1 text-xs font-black rounded-full bg-[#7B1B38] text-white flex items-center uppercase tracking-wider">
                     <Award className="w-3.5 h-3.5 mr-1" />
-                    Prestijli
+                    <T k="activities.prestigious" />
                   </span>
                 )}
                 {activity.isClosed ? (
                   <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-700">
-                    Başvurular Kapalı
+                    <T k="detail.closed" />
                   </span>
                 ) : (
                   <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700">
-                    Başvurular Açık
+                    <T k="detail.open" />
                   </span>
                 )}
               </div>
@@ -106,7 +107,7 @@ export default async function ActivityDetailPage({
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">Konum / Lokasyon</p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.location" /></p>
                     <p className="font-bold text-sm">{activity.location}</p>
                   </div>
                 </div>
@@ -117,7 +118,7 @@ export default async function ActivityDetailPage({
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Süre / Süreç</p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.duration" /></p>
                   <p className="font-bold text-sm">{activity.duration}</p>
                 </div>
               </div>
@@ -127,8 +128,8 @@ export default async function ActivityDetailPage({
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Dönem</p>
-                  <p className="font-bold text-sm">{seasonLabels[activity.season]}</p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.season" /></p>
+                    <p className="font-bold text-sm"><LocaleText {...seasonLabels[activity.season as keyof typeof seasonLabels]} /></p>
                 </div>
               </div>
 
@@ -138,9 +139,9 @@ export default async function ActivityDetailPage({
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">Son Başvuru Tarihi</p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.deadline" /></p>
                     <p className="font-bold text-sm">
-                      {new Date(activity.deadline).toLocaleDateString("tr-TR")}
+                      <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} />
                     </p>
                   </div>
                 </div>
@@ -153,19 +154,17 @@ export default async function ActivityDetailPage({
                 <div>
                   <p className="text-[10px] uppercase font-bold text-[#7A696C]">
                     {activity.category === "SCHOLARSHIP"
-                      ? "Burs Miktarı"
-                      : "Maddi Destek"}
+                      ? <T k="detail.scholarshipAmount" />
+                      : <T k="detail.financialSupport" />}
                   </p>
                   <p className="font-bold text-sm">
                     {activity.scholarshipAmount != null
                       ? activity.scholarshipAmount
-                      : financialLabels[activity.financialSupport] ||
-                        activity.financialSupport}
+                      : financialLabels[activity.financialSupport] ? <LocaleText {...financialLabels[activity.financialSupport]} /> : activity.financialSupport}
                   </p>
                   {activity.scholarshipAmount != null && (
                     <p className="text-xs text-[#7A696C] mt-0.5">
-                      {financialLabels[activity.financialSupport] ||
-                        activity.financialSupport}
+                      {financialLabels[activity.financialSupport] ? <LocaleText {...financialLabels[activity.financialSupport]} /> : activity.financialSupport}
                     </p>
                   )}
                 </div>
@@ -178,11 +177,11 @@ export default async function ActivityDetailPage({
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-[#7A696C]">
-                      Katılım Ücreti
+                      <T k="detail.entryFee" />
                     </p>
                     <p className="font-bold text-sm">
                       {Number(activity.entryPrice) === 0
-                        ? "Ücretsiz"
+                        ? <T k="detail.free" />
                         : formatAmount(
                             activity.entryPrice,
                             activity.amountCurrency
@@ -197,9 +196,9 @@ export default async function ActivityDetailPage({
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">Hedef Sınıflar</p>
-                  <p className="font-bold text-sm">
-                    {activity.gradeLevels.map((l) => `${l}.`).join(", ")} Sınıflar
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.targetGrades" /></p>
+                    <p className="font-bold text-sm">
+                    {activity.gradeLevels.map((l) => `${l}.`).join(", ")} <T k="detail.grades" />
                   </p>
                 </div>
               </div>
@@ -207,20 +206,20 @@ export default async function ActivityDetailPage({
 
             <div className="space-y-4">
               <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
-                Açıklama / Detaylar
+                <T k="detail.description" />
               </h2>
               <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm text-justify">
-                {activity.description}
+                <LocalizedDescription text={activity.description} />
               </p>
             </div>
 
             {activity.requirements && (
               <div className="space-y-4 pt-4">
                 <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
-                  Katılım Koşulları & Gereksinimler
+                  <T k="detail.requirements" />
                 </h2>
                 <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm">
-                  {activity.requirements}
+                  <LocalizedDescription text={activity.requirements} />
                 </p>
               </div>
             )}
@@ -234,7 +233,7 @@ export default async function ActivityDetailPage({
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:scale-105 duration-200"
                 >
                   <ExternalLink className="w-5 h-5" />
-                  Resmi Başvuru Sitesini Ziyaret Et
+                  <T k="detail.visitOfficial" />
                 </a>
               </div>
             )}

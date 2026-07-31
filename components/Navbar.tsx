@@ -3,16 +3,19 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useSession, signOut } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import { Compass, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useLanguage } from "@/lib/i18n"
 
 export default function Navbar() {
   const { data: session } = useSession()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const { locale, setLocale, t } = useLanguage()
 
   const handleSignOut = async () => {
     await signOut()
@@ -27,10 +30,10 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <Link
             href="/"
-            className="text-2xl flex gap-3 items-center font-black text-[#7B1B38] cursor-pointer tracking-tight"
+            className="text-2xl flex gap-2.5 items-center font-black text-[#7B1B38] cursor-pointer tracking-tight"
           >
-            <Compass className="scale-110 text-[#7B1B38] transition-transform group-hover:rotate-12" />
-            <span>Compass</span>
+            <Image src="/logo.svg" alt="YouthCompass" width={36} height={36} className="h-9 w-9" />
+            <span>YouthCompass</span>
           </Link>
 
           {/* Desktop Menu */}
@@ -39,22 +42,36 @@ export default function Navbar() {
               href="/activities"
               className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
             >
-              Etkinlikler
+              {t("nav.activities")}
             </Link>
 
             <Link
               href="/scholarships"
               className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
             >
-              Burslar
+              {t("nav.scholarships")}
             </Link>
 
             <Link
               href="/about"
               className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
             >
-              Hakkımızda
+              {t("nav.about")}
             </Link>
+
+            <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] p-1" aria-label={t("language.label")}>
+              {(["tr", "en"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setLocale(option)}
+                  aria-pressed={locale === option}
+                  className={`px-2 py-1 text-[11px] font-black rounded-lg transition-colors cursor-pointer ${locale === option ? "bg-[#7B1B38] text-white" : "text-[#7B1B38] hover:bg-[#FFE5B4]/40"}`}
+                >
+                  {option.toUpperCase()}
+                </button>
+              ))}
+            </div>
 
             {session ? (
               <div className="flex items-center gap-4 border-l border-[#F1E2D9] pl-6">
@@ -62,21 +79,21 @@ export default function Navbar() {
                   href="/profile"
                   className="text-sm font-semibold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
                 >
-                  {session.user?.name || "Profil"}
+                  {session.user?.name || t("nav.profile")}
                 </Link>
 
                 <Link
                   href="/admin"
                   className="text-sm text-[#7B1B38] font-black hover:text-[#5A1127] transition-colors cursor-pointer"
                 >
-                  Panel
+                  {t("nav.panel")}
                 </Link>
 
                 <button
                   onClick={handleSignOut}
                   className="text-sm px-4 py-2 bg-[#7B1B38] hover:bg-[#5A1127] text-white rounded-xl transition-colors font-bold cursor-pointer"
                 >
-                  Çıkış
+                  {t("nav.signOut")}
                 </button>
               </div>
             ) : (
@@ -85,13 +102,13 @@ export default function Navbar() {
                   href="/auth/sign-in"
                   className="text-sm text-[#7B1B38] font-bold hover:text-[#5A1127] transition-colors cursor-pointer"
                 >
-                  Giriş Yap
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/auth/sign-up"
                   className="text-sm px-4 py-2 bg-[#7B1B38] hover:bg-[#5A1127] text-white rounded-xl transition-all shadow-xs hover:shadow-md font-bold cursor-pointer"
                 >
-                  Kaydol
+                  {t("nav.signUp")}
                 </Link>
               </div>
             )}
@@ -113,12 +130,28 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2 border-t border-[#F1E2D9] mt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center justify-between px-4 pt-3">
+              <span className="text-xs font-bold text-[#7B1B38]">{t("language.label")}</span>
+              <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] p-1">
+                {(["tr", "en"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setLocale(option)}
+                    aria-pressed={locale === option}
+                    className={`px-2 py-1 text-[11px] font-black rounded-lg transition-colors cursor-pointer ${locale === option ? "bg-[#7B1B38] text-white" : "text-[#7B1B38] hover:bg-[#FFE5B4]/40"}`}
+                  >
+                    {option.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Link
               href="/activities"
               className="block px-4 py-2.5 text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
-              Etkinlikler
+              {t("nav.activities")}
             </Link>
 
             <Link
@@ -126,7 +159,7 @@ export default function Navbar() {
               className="block px-4 py-2.5 text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
-              Burslar
+              {t("nav.scholarships")}
             </Link>
 
             <Link
@@ -134,7 +167,7 @@ export default function Navbar() {
               className="block px-4 py-2.5 text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
-              Hakkımızda
+              {t("nav.about")}
             </Link>
 
             {session ? (
@@ -144,7 +177,7 @@ export default function Navbar() {
                   className="block px-4 py-2.5 text-sm font-semibold text-[#2B0510]/80 hover:text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
-                  {session.user?.name || "Profil"}
+                  {session.user?.name || t("nav.profile")}
                 </Link>
 
                 <Link
@@ -152,14 +185,14 @@ export default function Navbar() {
                   className="block px-4 py-2.5 text-sm font-bold text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
-                  Panel
+                  {t("nav.panel")}
                 </Link>
 
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                 >
-                  Çıkış Yap
+                  {t("nav.signOut")}
                 </button>
               </div>
             ) : (
@@ -169,14 +202,14 @@ export default function Navbar() {
                   className="block px-4 py-2.5 text-sm font-bold text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
-                  Giriş Yap
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/auth/sign-up"
                   className="block px-4 py-2.5 text-sm font-bold bg-[#7B1B38] text-white rounded-xl hover:bg-[#5A1127] text-center shadow-xs transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
-                  Kaydol
+                  {t("nav.signUp")}
                 </Link>
               </div>
             )}

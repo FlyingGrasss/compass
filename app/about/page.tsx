@@ -1,11 +1,13 @@
 // app/about/page.tsx
 
 import Link from "next/link"
-import { Compass, BookOpen, Compass as CompassIcon, GraduationCap, Target, Heart } from "lucide-react"
+import Image from "next/image"
+import { BookOpen, GraduationCap, Target, Heart } from "lucide-react"
+import { LocaleText, T } from "@/lib/i18n"
 
 export const metadata = {
-  title: "Hakkımızda | Compass",
-  description: "Compass, 13-20 yaş arasındaki gençlere yurt dışında eğitim, staj ve gönüllülük fırsatlarında yol gösteren ücretsiz bir rehberdir.",
+  title: "Hakkımızda | YouthCompass",
+  description: "YouthCompass, 13-20 yaş arasındaki gençlere yurt dışında eğitim, staj ve gönüllülük fırsatlarında yol gösteren ücretsiz bir rehberdir.",
 }
 
 export default function AboutPage() {
@@ -16,13 +18,13 @@ export default function AboutPage() {
         {/* Hero Header Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex p-3 rounded-full bg-[#FFE5B4] text-[#7B1B38] mb-2 animate-bounce">
-            <CompassIcon className="w-8 h-8" />
+            <Image src="/logo.svg" alt="YouthCompass" width={32} height={32} className="w-8 h-8" />
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-[#7B1B38]">
-            Pusulanız Compass
+            <T k="about.title" />
           </h1>
           <p className="text-lg sm:text-xl text-[#7B1B38]/80 font-medium">
-            Gençlerin kendi yolculuklarını keşfetmeleri ve geleceğe güvenle adım atmaları için tasarlanmış bağımsız bir rehber.
+            <T k="about.subtitle" />
           </p>
           <div className="w-24 h-1 bg-[#7B1B38] mx-auto rounded-full mt-4"></div>
         </div>
@@ -37,27 +39,27 @@ export default function AboutPage() {
                 <div className="p-3 bg-[#FFE5B4] text-[#7B1B38] rounded-xl">
                   <Target className="w-6 h-6" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#7B1B38]">Biz kimiz? / Who are we?</h2>
+                <h2 className="text-2xl font-bold text-[#7B1B38]"><T k="about.whoTitle" /></h2>
               </div>
               
               <div className="space-y-4 text-justify">
                 <p className="text-[#2B0510]/95 leading-relaxed font-medium">
-                  Compass 13-20 yaş arasındaki gençlere yurt dışında okuma, staj programları ve gönüllülük projelerine katılma gibi konularda rehber olmak için tasarlanmıştır. Compass’in kurulma amacı başta Türkiye olmak üzere tüm gençlere okul ve iş hayatında bir pusula görevi görmek ve gençlerin kendilerini bulma yolculuğuna yardımcı olmaktır.
+                  <LocaleText tr="YouthCompass, 13-20 yaş arasındaki gençlere yurt dışında okuma, staj programları ve gönüllülük projelerine katılma gibi konularda rehber olmak için tasarlanmıştır. Kuruluş amacı, başta Türkiye olmak üzere tüm gençlere okul ve iş hayatında bir pusula görevi görmek ve gençlerin kendilerini bulma yolculuğuna yardımcı olmaktır." en="YouthCompass is designed to guide young people aged 13–20 in studying abroad, internships, and volunteering projects. Its purpose is to act as a compass for young people, starting in Turkey, throughout their education and working lives, and to support them on their journey of self-discovery." />
                 </p>
                 <p className="text-[#2B0510]/80 leading-relaxed italic border-l-4 border-[#FFE5B4] pl-4 text-sm">
-                  Compass is designed to guide youth aged 13-20 in areas such as studying abroad, internship programs, and participating in voluntary projects. The founding purpose of Compass is to act as a compass for all young people, starting with Turkey, in their school and work lives, and to help them on their journey to self-discovery.
+                  <LocaleText tr="YouthCompass, 13-20 yaş arasındaki gençlere yurt dışında okuma, staj programları ve gönüllülük projelerine katılma gibi konularda rehber olmak için tasarlanmıştır. Kuruluş amacı, başta Türkiye olmak üzere tüm gençlere okul ve iş hayatında bir pusula görevi görmek ve gençlerin kendilerini bulma yolculuğuna yardımcı olmaktır." en="YouthCompass is designed to guide young people aged 13–20 in studying abroad, internships, and volunteering projects. Its purpose is to act as a compass for young people, starting in Turkey, throughout their education and working lives, and to support them on their journey of self-discovery." />
                 </p>
                 <p className="text-[#2B0510]/95 leading-relaxed font-medium">
-                  Yüzlerce fırsatı bir websitede toplayan Compass, bunu yaparken bir kar amacı gütmez. İlham verici yolculuğumuza siz de ücretsiz bir şekilde üye olarak katılabilirsiniz.
+                  <LocaleText tr="Yüzlerce fırsatı bir web sitesinde toplayan YouthCompass, bunu yaparken kâr amacı gütmez. İlham verici yolculuğumuza siz de ücretsiz bir şekilde üye olarak katılabilirsiniz." en="By bringing hundreds of opportunities together in one website, YouthCompass remains non-profit. You can join our inspiring journey by registering for free." />
                 </p>
                 <p className="text-[#2B0510]/80 leading-relaxed italic border-l-4 border-[#FFE5B4] pl-4 text-sm">
-                  Gathering hundreds of opportunities on one website, Compass does not pursue any profit. You can join our inspiring journey by registering for free.
+                  <LocaleText tr="Yüzlerce fırsatı bir web sitesinde toplayan YouthCompass, bunu yaparken kâr amacı gütmez. İlham verici yolculuğumuza siz de ücretsiz bir şekilde üye olarak katılabilirsiniz." en="By bringing hundreds of opportunities together in one website, YouthCompass remains non-profit. You can join our inspiring journey by registering for free." />
                 </p>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60">Geleceğini Şekillendir</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60"><T k="about.shapeFuture" /></span>
               <Heart className="w-5 h-5 text-[#7B1B38] fill-[#7B1B38]/10" />
             </div>
           </div>
@@ -69,27 +71,27 @@ export default function AboutPage() {
                 <div className="p-3 bg-[#FFE5B4] text-[#7B1B38] rounded-xl">
                   <GraduationCap className="w-6 h-6" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#7B1B38]">Yurt Dışında Okuma / Studying Abroad</h2>
+                <h2 className="text-2xl font-bold text-[#7B1B38]"><T k="about.abroadTitle" /></h2>
               </div>
               
               <div className="space-y-4 text-justify">
                 <p className="text-[#2B0510]/95 leading-relaxed font-medium">
-                  Her yıl Türkiye’den binlerce genç yurt dışına üniversite okumaya gidiyor. Yüz binlercesi ise böyle bir seçenekleri olduklarından bile habersiz. Bu fırsat eşitsizliğini engellemek için Compass var.
+                  <LocaleText tr="Her yıl Türkiye'den binlerce genç yurt dışına üniversite okumaya gidiyor. Yüz binlercesi ise böyle bir seçenekleri olduğundan bile habersiz. YouthCompass, bu fırsat eşitsizliğini azaltmak için var." en="Every year, thousands of young people from Turkey go abroad for university. Hundreds of thousands more are not even aware that this option exists. YouthCompass exists to help reduce this inequality of opportunity." />
                 </p>
                 <p className="text-[#2B0510]/80 leading-relaxed italic border-l-4 border-[#FFE5B4] pl-4 text-sm">
-                  Every year, thousands of young people from Turkey go abroad for university education. Hundreds of thousands, however, are not even aware that they have such an option. Compass exists to prevent this inequality of opportunity.
+                  <LocaleText tr="Her yıl Türkiye'den binlerce genç yurt dışına üniversite okumaya gidiyor. Yüz binlercesi ise böyle bir seçenekleri olduğundan bile habersiz. YouthCompass, bu fırsat eşitsizliğini azaltmak için var." en="Every year, thousands of young people from Turkey go abroad for university. Hundreds of thousands more are not even aware that this option exists. YouthCompass exists to help reduce this inequality of opportunity." />
                 </p>
                 <p className="text-[#2B0510]/95 leading-relaxed font-medium">
-                  Yurt dışında okumayı hedefleyen ve yolculuğunun daha çok başında olan öğrencilerden, yurt dışında okuyabileceğini yeni öğrenen öğrencilere kadar hevesli bütün gençlere yol göstermek için Compass var. Compass bu serüveni gençler için daha erişilebilir ve kolay hale getirmeyi amaçlıyor.
+                  <LocaleText tr="Yurt dışında okumayı hedefleyen ve yolculuğunun daha başında olan öğrencilerden, yurt dışında okuyabileceğini yeni öğrenen öğrencilere kadar tüm hevesli gençlere yol göstermek için varız. Bu serüveni gençler için daha erişilebilir ve kolay hale getirmeyi amaçlıyoruz." en="We are here to guide every enthusiastic young person, from students just beginning their journey to those who have only recently discovered that studying abroad is possible. We aim to make this adventure more accessible and easier for young people." />
                 </p>
                 <p className="text-[#2B0510]/80 leading-relaxed italic border-l-4 border-[#FFE5B4] pl-4 text-sm">
-                  Compass exists to guide all enthusiastic young people, from students who aim to study abroad and are at the very beginning of their journey, to students who have just learned that they can study abroad. Compass aims to make this adventure more accessible and easy for youth.
+                  <LocaleText tr="Yurt dışında okumayı hedefleyen ve yolculuğunun daha başında olan öğrencilerden, yurt dışında okuyabileceğini yeni öğrenen öğrencilere kadar tüm hevesli gençlere yol göstermek için varız. Bu serüveni gençler için daha erişilebilir ve kolay hale getirmeyi amaçlıyoruz." en="We are here to guide every enthusiastic young person, from students just beginning their journey to those who have only recently discovered that studying abroad is possible. We aim to make this adventure more accessible and easier for young people." />
                 </p>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60">Sınırları Aş</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60"><T k="about.crossBorders" /></span>
               <BookOpen className="w-5 h-5 text-[#7B1B38]" />
             </div>
           </div>
@@ -101,10 +103,10 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,229,180,0.15),transparent_50%)]"></div>
           
           <h3 className="text-3xl font-extrabold tracking-tight relative z-10">
-            İlham Verici Yolculuğumuza Katılın!
+            <T k="about.ctaTitle" />
           </h3>
           <p className="text-lg text-white/90 max-w-2xl mx-auto relative z-10">
-            Compass tamamen ücretsiz ve kar amacı gütmeyen bir platformdur. Kaydolarak yüzlerce eğitim, staj, burs ve gönüllülük projesine anında erişebilirsiniz.
+            <LocaleText tr="YouthCompass tamamen ücretsiz ve kâr amacı gütmeyen bir platformdur. Kaydolarak yüzlerce eğitim, staj, burs ve gönüllülük projesine anında erişebilirsiniz." en="YouthCompass is a completely free, non-profit platform. Register to access hundreds of education, internship, scholarship, and volunteering opportunities." />
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 relative z-10">
@@ -112,13 +114,13 @@ export default function AboutPage() {
               href="/auth/sign-up"
               className="px-8 py-3 bg-[#FFE5B4] hover:bg-[#FFD48F] text-[#7B1B38] font-bold rounded-xl transition-all shadow-md transform hover:scale-105 duration-200"
             >
-              Ücretsiz Üye Ol
+              <T k="home.joinFree" />
             </Link>
             <Link
               href="/activities"
               className="px-8 py-3 bg-white/10 hover:bg-white/20 text-[#FFFDF9] border border-white/20 font-bold rounded-xl transition-all duration-200"
             >
-              Fırsatları Keşfet
+              <T k="home.explore" />
             </Link>
           </div>
         </div>

@@ -79,7 +79,7 @@ export const competitions: CompetitionSeed[] = [
     name: "Appcent",
     slug: "appcent-platform",
     description:
-      "Mobil uygulama, e-ticaret ve web geliştirme odaklı dijital dönüşüm çözümleri sunan şirket; Hackathon Türkiye gibi ekosistemlerde sponsor veya iş ortağı olarak yer alabilir. Compass’ta, hackathon ve teknoloji etkinlikleri keşfi için yönlendirici bir kaynak olarak listelenmiştir.\n\n[English] Digital product studio; may appear as a partner in Turkish hackathon ecosystems rather than hosting its own recurring student contest.",
+      "Mobil uygulama, e-ticaret ve web geliştirme odaklı dijital dönüşüm çözümleri sunan şirket; Hackathon Türkiye gibi ekosistemlerde sponsor veya iş ortağı olarak yer alabilir. YouthCompass’ta, hackathon ve teknoloji etkinlikleri keşfi için yönlendirici bir kaynak olarak listelenmiştir.\n\n[English] Digital product studio; may appear as a partner in Turkish hackathon ecosystems rather than hosting its own recurring student contest.",
     category: ActivityCategory.PLATFORM,
     gradeLevels: [9, 10, 11, 12, 13, 14, 15, 16],
     financialSupport: "D",

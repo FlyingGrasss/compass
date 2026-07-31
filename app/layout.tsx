@@ -6,6 +6,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
+import { LanguageProvider } from "@/lib/i18n"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Compass - Staj ve Fırsatlar Platformu",
+  title: "YouthCompass - Staj ve Fırsatlar Platformu",
   description:
     "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu. Binlerce fırsat keşfet!",
   keywords: [
@@ -30,35 +31,34 @@ export const metadata: Metadata = {
     "yarışma",
     "gönüllülük",
   ],
-  authors: [{ name: "Compass" }],
+  authors: [{ name: "YouthCompass" }],
   metadataBase: new URL("https://snowday-flax.vercel.app"),
   openGraph: {
     type: "website",
     locale: "tr_TR",
     url: "https://snowday-flax.vercel.app",
-    title: "Compass - Staj ve Fırsatlar Platformu",
+    title: "YouthCompass - Staj ve Fırsatlar Platformu",
     description:
       "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu.",
-    siteName: "Compass",
+    siteName: "YouthCompass",
     images: [
       {
-        url: "/icon.png",
+        url: "/opengraph-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Compass",
+        alt: "YouthCompass",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Compass - Staj ve Fırsatlar Platformu",
+    title: "YouthCompass - Staj ve Fırsatlar Platformu",
     description:
       "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu.",
-    images: ["/icon.png"],
+    images: ["/opengraph-image.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/icon.png",
+    icon: "/logo.svg",
   },
 }
 
@@ -68,14 +68,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background flex flex-col min-h-screen`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Toaster />
+        <LanguageProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster />
+        </LanguageProvider>
       </body>
     </html>
   )

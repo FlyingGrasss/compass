@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
-import { Calendar, MapPin, Award, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
-import { ActivityCategory, ActivitySeason } from "@prisma/client"
+import { MapPin, Award, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
+import { ActivityCategory, ActivitySeason, Prisma } from "@prisma/client"
+import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
 
 export const metadata = {
-  title: "Tüm Fırsatlar & Etkinlikler | Compass",
+  title: "Tüm Fırsatlar & Etkinlikler | YouthCompass",
   description: "Liseli ve üniversiteli gençler için yarışmalar, yaz programları, staj ve gönüllülük fırsatları.",
 }
 
@@ -33,7 +34,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   const sortOption = resolvedSearchParams.sort || "deadline_asc"
 
   // Build Prisma query
-  const whereClause: any = {}
+  const whereClause: Prisma.ActivityWhereInput = {}
 
   if (searchQuery) {
     whereClause.OR = [
@@ -73,7 +74,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     }
   }
 
-  let activities: any[] = []
+  let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = []
   try {
     activities = await prisma.activity.findMany({
       where: whereClause,
@@ -110,21 +111,21 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 
-  const categoryLabels: Record<string, string> = {
-    COMPETITION: "Yarışma",
-    VOLUNTEER: "Gönüllülük",
-    SUMMER_PROGRAM: "Yaz Programı",
-    SCHOOL_PROGRAM: "Okul Programı",
-    SCHOLARSHIP: "Burs",
-    PLATFORM: "Platform",
+  const categoryLabels: Record<string, { tr: string; en: string }> = {
+    COMPETITION: { tr: "Yarışma", en: "Competition" },
+    VOLUNTEER: { tr: "Gönüllülük", en: "Volunteering" },
+    SUMMER_PROGRAM: { tr: "Yaz Programı", en: "Summer Program" },
+    SCHOOL_PROGRAM: { tr: "Okul Programı", en: "School Program" },
+    SCHOLARSHIP: { tr: "Burs", en: "Scholarship" },
+    PLATFORM: { tr: "Platform", en: "Platform" },
   }
 
-  const seasonLabels: Record<string, string> = {
-    SUMMER: "Yaz",
-    WINTER: "Kış",
-    FALL: "Sonbahar",
-    SPRING: "İlkbahar",
-    YEAR_ROUND: "Yıl Boyu",
+  const seasonLabels: Record<string, { tr: string; en: string }> = {
+    SUMMER: { tr: "Yaz", en: "Summer" },
+    WINTER: { tr: "Kış", en: "Winter" },
+    FALL: { tr: "Sonbahar", en: "Fall" },
+    SPRING: { tr: "İlkbahar", en: "Spring" },
+    YEAR_ROUND: { tr: "Yıl Boyu", en: "Year-round" },
   }
 
   const hasActiveFilters =
@@ -136,27 +137,27 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     statusFilter !== "ALL" ||
     sortOption !== "deadline_asc"
 
-  const getDeadlineInfo = (deadlineStr?: string | Date, isClosed?: boolean) => {
+  const getDeadlineInfo = (deadlineStr?: string | Date | null, isClosed?: boolean) => {
     if (isClosed) {
-      return { label: "Başvurular Kapandı", color: "bg-gray-200 text-gray-700", isExpired: true }
+      return { tr: "Başvurular Kapandı", en: "Applications closed", color: "bg-gray-200 text-gray-700", isExpired: true }
     }
     if (!deadlineStr) {
-      return { label: "Sürekli / Açık", color: "bg-emerald-100 text-emerald-800", isExpired: false }
+      return { tr: "Sürekli / Açık", en: "Ongoing / Open", color: "bg-emerald-100 text-emerald-800", isExpired: false }
     }
     const deadline = new Date(deadlineStr)
-    const diffTime = deadline.getTime() - Date.now()
+    const diffTime = deadline.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
     if (diffDays < 0) {
-      return { label: "Süresi Doldu", color: "bg-gray-200 text-gray-700", isExpired: true }
+      return { tr: "Süresi Doldu", en: "Expired", color: "bg-gray-200 text-gray-700", isExpired: true }
     } else if (diffDays === 0) {
-      return { label: "🔥 Bugüne Özel!", color: "bg-red-600 text-white animate-pulse font-extrabold", isExpired: false }
+      return { tr: "🔥 Bugüne Özel!", en: "🔥 Today only!", color: "bg-red-600 text-white animate-pulse font-extrabold", isExpired: false }
     } else if (diffDays <= 7) {
-      return { label: `⚡ Son ${diffDays} Gün!`, color: "bg-rose-500 text-white font-black animate-pulse", isExpired: false }
+      return { tr: `⚡ Son ${diffDays} Gün!`, en: `⚡ ${diffDays} days left!`, color: "bg-rose-500 text-white font-black animate-pulse", isExpired: false }
     } else if (diffDays <= 30) {
-      return { label: `⏳ Son ${diffDays} Gün`, color: "bg-amber-500 text-white font-bold", isExpired: false }
+      return { tr: `⏳ Son ${diffDays} Gün`, en: `⏳ ${diffDays} days left`, color: "bg-amber-500 text-white font-bold", isExpired: false }
     } else {
-      return { label: `📅 ${deadline.toLocaleDateString("tr-TR")}`, color: "bg-sky-100 text-sky-900 font-bold", isExpired: false }
+      return { tr: `📅 ${deadline.toLocaleDateString("tr-TR")}`, en: `📅 ${deadline.toLocaleDateString("en-US")}`, color: "bg-sky-100 text-sky-900 font-bold", isExpired: false }
     }
   }
 
@@ -166,13 +167,13 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/50 border border-[#FFE5B4] text-[#7B1B38] text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> Fırsat Kataloğu
+            <Sparkles className="w-3.5 h-3.5" /> <T k="activities.badge" />
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-[#7B1B38] tracking-tight">
-            Tüm Fırsatlar & Etkinlikler
+            <T k="activities.title" />
           </h1>
           <p className="text-base sm:text-lg text-[#2B0510]/75 max-w-2xl mx-auto font-medium">
-            Başvuru tarihleri yaklaşan fırsatları öncelikli olarak keşfedin ve hayalinizdeki programa zamanında başvurun.
+            <T k="activities.description" />
           </p>
         </div>
 
@@ -182,11 +183,12 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7A696C]" />
-              <input
+              <LocalizedInput
                 type="text"
                 name="search"
                 defaultValue={searchQuery}
-                placeholder="Başlık, açıklama, gereksinim veya konum ara..."
+                trPlaceholder="Başlık, açıklama, gereksinim veya konum ara..."
+                enPlaceholder="Search by title, description, requirement, or location..."
                 className="w-full pl-12 pr-4 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-[#2B0510] placeholder:text-[#7A696C]/60 font-medium outline-none focus:border-[#7B1B38] focus:ring-1 focus:ring-[#7B1B38] transition-all"
               />
             </div>
@@ -196,105 +198,105 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
               {/* Sort Option */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1 flex items-center gap-1">
-                  <ArrowUpDown className="w-3 h-3" /> Sıralama
+                  <ArrowUpDown className="w-3 h-3" /> <T k="activities.sort" />
                 </label>
                 <select
                   name="sort"
                   defaultValue={sortOption}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#7B1B38]/30 rounded-xl text-xs sm:text-sm font-bold text-[#7B1B38] outline-none cursor-pointer"
                 >
-                  <option value="deadline_asc">⏰ Yaklaşan Son Başvuru</option>
-                  <option value="newest">✨ En Yeni Ekleme</option>
-                  <option value="deadline_desc">📅 İleri Tarihli</option>
+                  <option value="deadline_asc"><T k="activities.sortUpcoming" /></option>
+                  <option value="newest"><T k="activities.sortNewest" /></option>
+                  <option value="deadline_desc"><T k="activities.sortLatest" /></option>
                 </select>
               </div>
 
               {/* Category */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  Kategori
+                  <T k="activities.category" />
                 </label>
                 <select
                   name="category"
                   defaultValue={categoryFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
-                  <option value="ALL">Tüm Kategoriler</option>
-                  <option value="COMPETITION">Yarışma</option>
-                  <option value="VOLUNTEER">Gönüllülük</option>
-                  <option value="SUMMER_PROGRAM">Yaz Programı</option>
-                  <option value="SCHOOL_PROGRAM">Okul Programı</option>
-                  <option value="SCHOLARSHIP">Burs</option>
-                  <option value="PLATFORM">Platform</option>
+                  <option value="ALL"><T k="activities.allCategories" /></option>
+                  <option value="COMPETITION"><T k="activities.competition" /></option>
+                  <option value="VOLUNTEER"><T k="home.volunteering" /></option>
+                  <option value="SUMMER_PROGRAM"><T k="activities.summerProgram" /></option>
+                  <option value="SCHOOL_PROGRAM"><T k="activities.schoolProgram" /></option>
+                  <option value="SCHOLARSHIP"><T k="nav.scholarships" /></option>
+                  <option value="PLATFORM"><T k="home.platforms" /></option>
                 </select>
               </div>
 
               {/* Season */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  Sezon / Dönem
+                  <T k="activities.season" />
                 </label>
                 <select
                   name="season"
                   defaultValue={seasonFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
-                  <option value="ALL">Tüm Sezonlar</option>
-                  <option value="SUMMER">Yaz</option>
-                  <option value="WINTER">Kış</option>
-                  <option value="FALL">Sonbahar</option>
-                  <option value="SPRING">İlkbahar</option>
-                  <option value="YEAR_ROUND">Yıl Boyu</option>
+                  <option value="ALL"><T k="activities.allSeasons" /></option>
+                  <option value="SUMMER"><T k="season.summer" /></option>
+                  <option value="WINTER"><T k="season.winter" /></option>
+                  <option value="FALL"><T k="season.fall" /></option>
+                  <option value="SPRING"><T k="season.spring" /></option>
+                  <option value="YEAR_ROUND"><T k="season.yearRound" /></option>
                 </select>
               </div>
 
               {/* Grade Level */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  Sınıf Seviyesi
+                  <T k="activities.grade" />
                 </label>
                 <select
                   name="grade"
                   defaultValue={gradeFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
-                  <option value="ALL">Tüm Sınıflar</option>
-                  <option value="9">9. Sınıf</option>
-                  <option value="10">10. Sınıf</option>
-                  <option value="11">11. Sınıf</option>
-                  <option value="12">12. Sınıf</option>
+                  <option value="ALL"><T k="activities.allGrades" /></option>
+                  <option value="9">9. <T k="activities.gradeWord" /></option>
+                  <option value="10">10. <T k="activities.gradeWord" /></option>
+                  <option value="11">11. <T k="activities.gradeWord" /></option>
+                  <option value="12">12. <T k="activities.gradeWord" /></option>
                 </select>
               </div>
 
               {/* Prestigious */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  Prestij Seviyesi
+                  <T k="activities.prestige" />
                 </label>
                 <select
                   name="prestigious"
                   defaultValue={prestigiousFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
-                  <option value="ALL">Tümü</option>
-                  <option value="yes">Sadece Prestijli</option>
-                  <option value="no">Standart Fırsatlar</option>
+                  <option value="ALL"><T k="activities.all" /></option>
+                  <option value="yes"><T k="activities.prestigiousOnly" /></option>
+                  <option value="no"><T k="activities.standard" /></option>
                 </select>
               </div>
 
               {/* Status */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  Başvuru Durumu
+                  <T k="activities.status" />
                 </label>
                 <select
                   name="status"
                   defaultValue={statusFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
-                  <option value="ALL">Tümü</option>
-                  <option value="open">Başvurusu Açık</option>
-                  <option value="closed">Tamamlandı / Kapalı</option>
+                  <option value="ALL"><T k="activities.all" /></option>
+                  <option value="open"><T k="activities.open" /></option>
+                  <option value="closed"><T k="activities.closed" /></option>
                 </select>
               </div>
             </div>
@@ -303,7 +305,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#F1E2D9]">
               <div className="text-xs font-bold text-[#2B0510]/70 flex items-center gap-1.5">
                 <Filter className="w-4 h-4 text-[#7B1B38]" />
-                <span>Toplam <strong className="text-[#7B1B38]">{activities.length}</strong> fırsat listeleniyor</span>
+                <T k="activities.count" values={{ count: activities.length }} />
               </div>
               <div className="flex items-center gap-2">
                 {hasActiveFilters && (
@@ -311,14 +313,14 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                     href="/activities"
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2B0510] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" /> Filtreleri Temizle
+                    <RefreshCw className="w-3.5 h-3.5" /> <T k="activities.clearFilters" />
                   </Link>
                 )}
                 <button
                   type="submit"
                   className="px-6 py-2.5 bg-[#7B1B38] hover:bg-[#5A1127] text-white text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer shadow-xs"
                 >
-                  Filtreleri Uygula
+                  <T k="activities.applyFilters" />
                 </button>
               </div>
             </div>
@@ -329,16 +331,16 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
         {activities.length === 0 ? (
           <div className="bg-white rounded-2xl border border-[#F1E2D9] shadow-sm p-12 text-center space-y-4">
             <p className="text-lg text-[#2B0510]/80 font-semibold">
-              Aradığınız kriterlere uygun sonuç bulunamadı.
+              <T k="activities.noResults" />
             </p>
             <p className="text-sm text-[#2B0510]/60 max-w-md mx-auto">
-              Filtrelerinizi esneterek veya farklı arama kelimeleri deneyerek diğer fırsatlara göz atabilirsiniz.
+              <T k="activities.noResultsDescription" />
             </p>
             <Link
               href="/activities"
               className="inline-block px-6 py-2.5 bg-[#7B1B38] text-white text-sm font-bold rounded-xl shadow-xs hover:bg-[#5A1127] transition-all"
             >
-              Tüm Fırsatları Göster
+              <T k="activities.showAll" />
             </Link>
           </div>
         ) : (
@@ -370,11 +372,11 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                     {/* Top Badges */}
                     <div className="absolute top-3 left-3 right-3 flex justify-between items-center gap-2">
                       <span className={`px-3 py-1.5 text-xs rounded-full shadow-md backdrop-blur-md ${deadlineInfo.color}`}>
-                        {deadlineInfo.label}
+                        <LocaleText tr={deadlineInfo.tr} en={deadlineInfo.en} />
                       </span>
                       {activity.isPrestigious && (
                         <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-[#7B1B38] text-[#FFFDF9] whitespace-nowrap shrink-0 uppercase tracking-wider shadow-sm">
-                          Prestijli
+                          <T k="activities.prestigious" />
                         </span>
                       )}
                     </div>
@@ -388,17 +390,17 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
 
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
-                          {categoryLabels[activity.category] || activity.category}
+                          {categoryLabels[activity.category] ? <LocaleText {...categoryLabels[activity.category]} /> : activity.category}
                         </span>
                         {activity.season && (
                           <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 text-[#2B0510]/80">
-                            {seasonLabels[activity.season] || activity.season}
+                            {seasonLabels[activity.season] ? <LocaleText {...seasonLabels[activity.season]} /> : activity.season}
                           </span>
                         )}
                       </div>
 
                       <p className="text-sm text-[#2B0510]/85 line-clamp-3 leading-relaxed font-medium pt-1">
-                        {activity.description}
+                        <LocalizedDescription text={activity.description} />
                       </p>
                     </div>
 
@@ -412,14 +414,14 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                       <div className={`flex items-center gap-2 p-2 rounded-lg ${deadlineInfo.isExpired ? "bg-gray-100 text-gray-600" : "bg-[#FFF9F0] text-[#7B1B38]"}`}>
                         <Clock className="w-4 h-4 shrink-0" />
                         <span className="font-bold">
-                          Son Başvuru: {activity.deadline ? new Date(activity.deadline).toLocaleDateString("tr-TR") : "Belirtilmedi / Sürekli"}
+                          <T k="activities.deadline" />: {activity.deadline ? <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} /> : <T k="activities.notSpecified" />}
                         </span>
                       </div>
                     </div>
 
                     <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 mt-auto">
                       <span className="text-[#7B1B38] font-bold text-sm">
-                        Detayları Gör →
+                        <T k="activities.details" />
                       </span>
                     </div>
                   </div>

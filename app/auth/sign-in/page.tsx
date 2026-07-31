@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { signIn, useSession } from "@/lib/auth-client"
 import { toast } from "sonner"
+import { T, useLanguage } from "@/lib/i18n"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const { t } = useLanguage()
 
   // Redirect to profile if already logged in
   useEffect(() => {
@@ -34,11 +36,11 @@ export default function SignInPage() {
         },
         {
           onSuccess: () => {
-            toast.success("Başarıyla giriş yapıldı!")
+            toast.success(t("auth.signedIn"))
             router.push("/profile")
           },
           onError: () => {
-            toast.error("E-posta veya şifre hatalı")
+            toast.error(t("auth.invalidCredentials"))
           },
         }
       )
@@ -51,7 +53,7 @@ export default function SignInPage() {
   if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-[#2B0510]">Yükleniyor...</div>
+        <div className="text-[#2B0510]"><T k="auth.loading" /></div>
       </div>
     )
   }
@@ -66,16 +68,16 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg border border-[#F1E2D9] p-8 space-y-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-[#2B0510]">Giriş Yap</h1>
+            <h1 className="text-3xl font-bold text-[#2B0510]"><T k="auth.signIn" /></h1>
             <p className="mt-2 text-[#2B0510]/70">
-              Hesabınıza giriş yapın
+              <T k="auth.signInDescription" />
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-[#2B0510] mb-1.5">
-                E-posta
+                <T k="auth.email" />
               </label>
               <input
                 id="email"
@@ -90,7 +92,7 @@ export default function SignInPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-[#2B0510] mb-1.5">
-                Şifre
+                <T k="auth.password" />
               </label>
               <input
                 id="password"
@@ -108,17 +110,17 @@ export default function SignInPage() {
               disabled={isLoading}
               className="w-full py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-6"
             >
-              {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+              {isLoading ? <T k="auth.signingIn" /> : <T k="auth.signIn" />}
             </button>
           </form>
 
           <div className="text-center text-sm">
-            <span className="text-[#2B0510]/70">Hesabınız yok mu? </span>
+            <span className="text-[#2B0510]/70"><T k="auth.noAccount" /> </span>
             <Link
               href="/auth/sign-up"
               className="text-[#7B1B38] hover:text-[#5A1127] font-medium"
             >
-              Kayıt Ol
+              <T k="auth.register" />
             </Link>
           </div>
         </div>

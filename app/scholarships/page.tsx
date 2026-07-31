@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
-import { Search, Filter, Calendar, MapPin, GraduationCap, DollarSign, Award, ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
+import { Search, Filter, Calendar, MapPin, DollarSign, Award, ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
+import { Prisma } from "@prisma/client"
+import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
 
 export const metadata = {
-  title: "Burslar & Burs Rehberi | Compass",
+  title: "Burslar & Burs Rehberi | YouthCompass",
   description: "Yurt dışında eğitim almak isteyen lise ve üniversite öğrencileri için en prestijli, güncel burs ve finansal destek fırsatları.",
 }
 
@@ -25,7 +27,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
   const prestigiousFilter = (await searchParams).prestigious || "all"
 
   // Build prisma query
-  const whereClause: any = {
+  const whereClause: Prisma.ActivityWhereInput = {
     category: "SCHOLARSHIP",
   }
 
@@ -74,11 +76,11 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
   // Format financial support descriptions
   const getFinancialSupportLabel = (code: string) => {
     switch (code) {
-      case "A+": return "Tam Burslu (Eğitim + Yaşam)"
-      case "A": return "Büyük Ölçüde Burslu"
-      case "B": return "Kısmi Burslu / Ödül"
-      case "C": return "Küçük Çekiliş / Katılım Ödülü"
-      default: return code || "Finansal Destek Detayda"
+      case "A+": return { tr: "Tam Burslu (Eğitim + Yaşam)", en: "Fully funded (Education + Living)" }
+      case "A": return { tr: "Büyük Ölçüde Burslu", en: "Mostly funded" }
+      case "B": return { tr: "Kısmi Burslu / Ödül", en: "Partially funded / Award" }
+      case "C": return { tr: "Küçük Çekiliş / Katılım Ödülü", en: "Small drawing / Participation award" }
+      default: return { tr: code || "Finansal Destek Detayda", en: code || "See details for financial support" }
     }
   }
 
@@ -93,13 +95,13 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
           
           <div className="max-w-3xl relative z-10 space-y-4">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/20 border border-[#FFE5B4]/30 text-[#FFE5B4] text-xs font-bold uppercase tracking-wider">
-              <Award className="w-3.5 h-3.5" /> Burs & Finansal Destek Fırsatları
+              <Award className="w-3.5 h-3.5" /> <T k="scholarships.badge" />
             </span>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-              Geleceğini Burslarla İnşa Et
+              <T k="scholarships.heroTitle" />
             </h1>
             <p className="text-lg text-white/80 leading-relaxed max-w-2xl">
-              Dünyanın en prestijli üniversitelerinden ve vakıflarından 37'den fazla burs fırsatını derledik. Compass ile kriterlerine uygun olanları filtrele ve hayallerine giden yolda destek bul!
+              <T k="scholarships.heroDescription" />
             </p>
           </div>
         </div>
@@ -111,11 +113,12 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
             {/* Search Input */}
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-3.5 h-5 w-5 text-[#7A696C]" />
-              <input
+              <LocalizedInput
                 type="text"
                 name="search"
                 defaultValue={searchQuery}
-                placeholder="Burs adı, gereksinimler veya anahtar kelimelerle ara..."
+                trPlaceholder="Burs adı, gereksinimler veya anahtar kelimelerle ara..."
+                enPlaceholder="Search by scholarship name, requirements, or keywords..."
                 className="w-full pl-11 pr-4 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-[#2B0510] font-medium placeholder-[#7A696C]/60 focus:outline-none focus:ring-2 focus:ring-[#7B1B38] focus:border-[#7B1B38] transition-all"
               />
             </div>
@@ -130,9 +133,9 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                   defaultValue={eligibilityFilter}
                   className="w-full sm:w-44 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
-                  <option value="all">Tüm Uygunluklar</option>
-                  <option value="global">Küresel / Türkiye</option>
-                  <option value="us">Sadece ABD</option>
+                  <option value="all"><T k="scholarships.allEligibility" /></option>
+                  <option value="global"><T k="scholarships.globalEligibility" /></option>
+                  <option value="us"><T k="scholarships.usOnly" /></option>
                 </select>
               </div>
 
@@ -143,9 +146,9 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                   defaultValue={statusFilter}
                   className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
-                  <option value="all">Tüm Durumlar</option>
-                  <option value="open">Açık Başvurular</option>
-                  <option value="closed">Kapanmış</option>
+                  <option value="all"><T k="scholarships.allStatuses" /></option>
+                  <option value="open"><T k="scholarships.openApplications" /></option>
+                  <option value="closed"><T k="scholarships.closed" /></option>
                 </select>
               </div>
 
@@ -156,8 +159,8 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                   defaultValue={prestigiousFilter}
                   className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
-                  <option value="all">Tüm Dereceler</option>
-                  <option value="true">Sadece Prestijli</option>
+                  <option value="all"><T k="scholarships.allLevels" /></option>
+                  <option value="true"><T k="scholarships.prestigiousOnly" /></option>
                 </select>
               </div>
 
@@ -168,7 +171,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
               type="submit"
               className="w-full sm:w-auto px-6 py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-bold rounded-xl shadow-md transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2"
             >
-              <Filter className="w-4 h-4" /> Filtrele
+              <Filter className="w-4 h-4" /> <T k="scholarships.filter" />
             </button>
           </form>
         </div>
@@ -176,14 +179,14 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
         {/* Directory Scholarships Count */}
         <div className="flex items-center justify-between border-b border-[#F1E2D9] pb-4">
           <p className="text-sm font-bold text-[#7A696C]">
-            Toplam <span className="text-[#7B1B38]">{scholarships.length}</span> burs listeleniyor
+            <T k="scholarships.count" values={{ count: scholarships.length }} />
           </p>
           {(searchQuery || statusFilter !== "all" || eligibilityFilter !== "all" || prestigiousFilter !== "all") && (
             <Link
               href="/scholarships"
               className="text-xs font-bold text-[#7B1B38] hover:underline"
             >
-              Filtreleri Temizle
+              <T k="scholarships.clearFilters" />
             </Link>
           )}
         </div>
@@ -194,9 +197,9 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
             <div className="w-16 h-16 bg-[#FFE5B4]/30 rounded-full flex items-center justify-center mx-auto text-[#7B1B38]">
               <AlertCircle className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-[#2B0510]">Sonuç Bulunamadı</h3>
+            <h3 className="text-xl font-bold text-[#2B0510]"><T k="scholarships.noResults" /></h3>
             <p className="text-sm text-[#7A696C] max-w-md mx-auto">
-              Belirttiğiniz kriterlere uygun burs fırsatı bulunmamaktadır. Farklı filtreler kullanmayı veya aramayı genişletmeyi deneyebilirsiniz.
+              <T k="scholarships.noResultsDescription" />
             </p>
           </div>
         ) : (
@@ -209,7 +212,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 {/* Prestigious Banner badge */}
                 {scholarship.isPrestigious && (
                   <div className="absolute top-0 right-0 bg-linear-to-l from-[#FFE5B4] to-[#FFF0D4] text-[#7B1B38] px-4 py-1.5 rounded-bl-xl text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 z-10 border-l border-b border-[#FFE5B4]">
-                    <Award className="w-3 h-3 fill-[#7B1B38]/10" /> Prestijli Fırsat
+                    <Award className="w-3 h-3 fill-[#7B1B38]/10" /> <T k="scholarships.prestigious" />
                   </div>
                 )}
 
@@ -220,11 +223,11 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                     {/* Status Badge */}
                     {scholarship.isClosed ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-bold">
-                        Kapandı
+                        <T k="scholarships.closedBadge" />
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
-                        <CheckCircle2 className="w-3 h-3" /> Açık
+                        <CheckCircle2 className="w-3 h-3" /> <T k="scholarships.openBadge" />
                       </span>
                     )}
 
@@ -233,7 +236,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                       <DollarSign className="w-3 h-3" />{" "}
                       {scholarship.scholarshipAmount != null
                         ? scholarship.scholarshipAmount
-                        : getFinancialSupportLabel(scholarship.financialSupport)}
+                        : <LocaleText {...getFinancialSupportLabel(scholarship.financialSupport)} />}
                     </span>
                   </div>
 
@@ -253,13 +256,13 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
 
                   {/* Description */}
                   <p className="text-sm text-[#2B0510]/85 line-clamp-4 leading-relaxed font-medium">
-                    {scholarship.description.split("\n\n")[0]}
+                    <LocalizedDescription text={scholarship.description} />
                   </p>
 
                   {/* Requirements Summary in card */}
                   {scholarship.requirements && (
                     <div className="bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl p-3 text-xs text-[#2B0510]/95 font-medium space-y-1">
-                      <span className="font-bold text-[#7B1B38] text-[10px] uppercase tracking-wider block">Gereksinimler:</span>
+                      <span className="font-bold text-[#7B1B38] text-[10px] uppercase tracking-wider block"><T k="scholarships.requirements" /></span>
                       <p className="line-clamp-2 leading-relaxed">
                         {scholarship.requirements.replace(/•\s/g, "")}
                       </p>
@@ -275,9 +278,9 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                     <Calendar className="w-4 h-4 text-[#7B1B38]" />
                     <span>
                       {scholarship.deadline ? (
-                        <>Son Tarih: {new Date(scholarship.deadline).toLocaleDateString("tr-TR")}</>
+                        <><T k="scholarships.deadline" />: <LocaleText tr={new Date(scholarship.deadline).toLocaleDateString("tr-TR")} en={new Date(scholarship.deadline).toLocaleDateString("en-US")} /></>
                       ) : (
-                        "Sürekli (Rolling)"
+                        <T k="scholarships.rolling" />
                       )}
                     </span>
                   </div>
@@ -290,14 +293,14 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] hover:text-[#5A1127] transition-colors group/btn"
                     >
-                      Başvur <ArrowUpRight className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                      <T k="scholarships.apply" /> <ArrowUpRight className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                     </a>
                   ) : (
                     <Link
                       href={`/activities/${scholarship.slug}`}
                       className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] hover:text-[#5A1127] transition-colors"
                     >
-                      Detay Gör →
+                      <T k="scholarships.viewDetails" />
                     </Link>
                   )}
                 </div>

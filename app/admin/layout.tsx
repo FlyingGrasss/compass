@@ -6,7 +6,7 @@ import { auth } from "@/auth"
 import { headers } from "next/headers"
 
 export const metadata: Metadata = {
-  title: "Yönetim Paneli - Compass",
+  title: "Yönetim Paneli - YouthCompass",
   description: "Etkinlikleri yönetin, oluşturun ve düzenleyin",
   robots: "noindex, nofollow",
 }

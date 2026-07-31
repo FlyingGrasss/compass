@@ -3,10 +3,11 @@
 "use client"
 
 import { useSession, signOut } from "@/lib/auth-client"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { User, Mail } from "lucide-react"
+import { T } from "@/lib/i18n"
 
 export default function ProfilePage() {
   const { data: session, isPending } = useSession()
@@ -27,7 +28,7 @@ export default function ProfilePage() {
   if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-[#2B0510]">Yükleniyor...</div>
+        <div className="text-[#2B0510]"><T k="auth.loading" /></div>
       </div>
     )
   }
@@ -43,10 +44,10 @@ export default function ProfilePage() {
           {/* Header */}
           <div className="text-center sm:text-left">
             <h1 className="text-3xl sm:text-4xl font-bold text-[#2B0510] mb-2">
-              Profil
+              <T k="profile.title" />
             </h1>
             <p className="text-[#2B0510]/70">
-              Hesap bilgilerinizi görüntüleyin ve yönetin
+              <T k="profile.description" />
             </p>
           </div>
 
@@ -59,7 +60,7 @@ export default function ProfilePage() {
                   <User className="w-5 h-5 text-[#7B1B38]" />
                 </div>
                 <label className="text-sm font-medium text-[#2B0510]/70">
-                  Ad Soyad
+                  <T k="auth.fullName" />
                 </label>
               </div>
               <p className="text-lg text-[#2B0510] ml-11">
@@ -74,7 +75,7 @@ export default function ProfilePage() {
                   <Mail className="w-5 h-5 text-[#7B1B38]" />
                 </div>
                 <label className="text-sm font-medium text-[#2B0510]/70">
-                  E-posta
+                  <T k="auth.email" />
                 </label>
               </div>
               <p className="text-lg text-[#2B0510] ml-11">
@@ -89,13 +90,13 @@ export default function ProfilePage() {
               onClick={() => router.push("/admin")}
               className="flex-1 px-6 py-3 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-medium rounded-lg transition-colors cursor-pointer"
             >
-              Etkinlik Düzenle
+              <T k="profile.editActivity" />
             </button>
             <button
               onClick={handleSignOut}
               className="flex-1 px-6 py-3 bg-white text-[#7B1B38] font-medium rounded-lg border-2 border-[#F1E2D9] hover:border-[#7B1B38] hover:bg-[#FFE5B4]/30 transition-colors cursor-pointer"
             >
-              Çıkış Yap
+              <T k="nav.signOut" />
             </button>
           </div>
         </div>
