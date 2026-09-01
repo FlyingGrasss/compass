@@ -82,12 +82,14 @@ export default function Navbar() {
                   {session.user?.name || t("nav.profile")}
                 </Link>
 
-                <Link
-                  href="/admin"
-                  className="text-sm text-[#7B1B38] font-black hover:text-[#5A1127] transition-colors cursor-pointer"
-                >
-                  {t("nav.panel")}
-                </Link>
+                {session.user?.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="text-sm text-[#7B1B38] font-black hover:text-[#5A1127] transition-colors cursor-pointer"
+                  >
+                    {t("nav.panel")}
+                  </Link>
+                )}
 
                 <button
                   onClick={handleSignOut}
@@ -180,13 +182,15 @@ export default function Navbar() {
                   {session.user?.name || t("nav.profile")}
                 </Link>
 
-                <Link
-                  href="/admin"
-                  className="block px-4 py-2.5 text-sm font-bold text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t("nav.panel")}
-                </Link>
+                {session.user?.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="block px-4 py-2.5 text-sm font-bold text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {t("nav.panel")}
+                  </Link>
+                )}
 
                 <button
                   onClick={handleSignOut}

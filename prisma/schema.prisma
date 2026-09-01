@@ -16,6 +16,7 @@ model User {
   image         String?
   school        String?
   gradeLevel    Int?
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
@@ -111,4 +112,9 @@ enum ActivitySeason {
   FALL
   SPRING
   YEAR_ROUND
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }

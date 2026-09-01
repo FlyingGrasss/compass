@@ -49,6 +49,10 @@ export async function PUT(
       return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 })
     }
 
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Yönetici yetkisi gerekli" }, { status: 403 })
+    }
+
     const data = await req.json()
 
     const activity = await prisma.activity.update({
@@ -100,6 +104,10 @@ export async function DELETE(
 
     if (!session) {
       return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 })
+    }
+
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Yönetici yetkisi gerekli" }, { status: 403 })
     }
 
     await prisma.activity.delete({

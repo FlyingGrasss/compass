@@ -56,6 +56,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Yetkisiz erişim. Lütfen giriş yapın." }, { status: 401 })
     }
 
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Yönetici yetkisi gerekli" }, { status: 403 })
+    }
+
     // 2. Parse Body and retrieve activities array
     const body = await req.json()
     const rawActivities = Array.isArray(body) ? body : body?.activities

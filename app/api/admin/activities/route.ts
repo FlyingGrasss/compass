@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 })
     }
 
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Yönetici yetkisi gerekli" }, { status: 403 })
+    }
+
     const data = await req.json()
 
     const activity = await prisma.activity.create({
