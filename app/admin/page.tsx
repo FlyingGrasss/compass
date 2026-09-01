@@ -1,7 +1,7 @@
 // app/admin/page.tsx
 
 import Link from "next/link"
-import { Calendar, Award, Users, BookOpen, Plus, Clock, Sparkles, DollarSign, Globe, Layers } from "lucide-react"
+import { Calendar, Award, Users, BookOpen, Plus, Clock, Sparkles, DollarSign, Globe, Layers, UserCog } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 export default async function AdminDashboard() {
@@ -56,6 +56,13 @@ export default async function AdminDashboard() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/users"
+            className="flex items-center gap-2 rounded-lg border-2 border-[#7B1B38]/20 bg-[#F9EFE6] px-6 py-3 font-bold text-[#7B1B38] transition-all hover:bg-[#FFE5B4]/55"
+          >
+            <UserCog className="h-5 w-5 text-[#7B1B38]" />
+            Kullanıcılar
+          </Link>
           <Link
             href="/admin/bulk-import"
             className="flex items-center gap-2 px-6 py-3 bg-[#F9EFE6] hover:bg-[#FFE5B4]/55 text-[#7B1B38] font-bold rounded-lg border-2 border-[#7B1B38]/20 transition-all cursor-pointer"
