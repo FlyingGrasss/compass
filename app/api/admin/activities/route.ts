@@ -5,6 +5,7 @@ import { auth } from "@/auth"
 import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { parseAmount } from "@/lib/format-amount"
+import { parseAgeRange } from "@/lib/activity-eligibility"
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await req.json()
+    const { minAge, maxAge } = parseAgeRange(data.minAge, data.maxAge)
 
     const activity = await prisma.activity.create({
       data: {
@@ -29,6 +31,8 @@ export async function POST(req: NextRequest) {
         description: data.description,
         category: data.category,
         gradeLevels: data.gradeLevels,
+        minAge,
+        maxAge,
         financialSupport: data.financialSupport,
         entryPrice: parseAmount(data.entryPrice),
         scholarshipAmount:

@@ -27,6 +27,7 @@ const userSelect = {
   role: true,
   school: true,
   gradeLevel: true,
+  age: true,
   createdAt: true,
 } as const
 

@@ -5,6 +5,7 @@ import { auth } from "@/auth"
 import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { parseAmount } from "@/lib/format-amount"
+import { parseAgeRange } from "@/lib/activity-eligibility"
 
 export async function GET(
   req: NextRequest,
@@ -54,6 +55,7 @@ export async function PUT(
     }
 
     const data = await req.json()
+    const { minAge, maxAge } = parseAgeRange(data.minAge, data.maxAge)
 
     const activity = await prisma.activity.update({
       where: { slug },
@@ -63,6 +65,8 @@ export async function PUT(
         description: data.description,
         category: data.category,
         gradeLevels: data.gradeLevels,
+        minAge,
+        maxAge,
         financialSupport: data.financialSupport,
         entryPrice: parseAmount(data.entryPrice),
         scholarshipAmount:

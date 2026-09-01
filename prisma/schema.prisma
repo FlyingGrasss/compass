@@ -16,6 +16,7 @@ model User {
   image         String?
   school        String?
   gradeLevel    Int?
+  age           Int?
   role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -78,6 +79,8 @@ model Activity {
   description     String           @db.Text
   category        ActivityCategory
   gradeLevels     Int[]
+  minAge          Int?
+  maxAge          Int?
   financialSupport String
   entryPrice        Decimal?        @db.Decimal(12, 2)
   scholarshipAmount String?         @db.Text

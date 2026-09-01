@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/auth"
+import { headers } from "next/headers"
 import { MapPin, Award, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
 import { ActivityCategory, ActivitySeason, Prisma } from "@prisma/client"
 import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
@@ -17,6 +19,8 @@ interface PageProps {
     category?: string
     season?: string
     grade?: string
+    age?: string
+    fit?: string
     prestigious?: string
     status?: string
     sort?: string
@@ -29,9 +33,28 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   const categoryFilter = resolvedSearchParams.category || "ALL"
   const seasonFilter = resolvedSearchParams.season || "ALL"
   const gradeFilter = resolvedSearchParams.grade || "ALL"
+  const ageFilter = resolvedSearchParams.age || "ALL"
+  const fitFilter = resolvedSearchParams.fit === "me"
   const prestigiousFilter = resolvedSearchParams.prestigious || "ALL"
   const statusFilter = resolvedSearchParams.status || "ALL"
   const sortOption = resolvedSearchParams.sort || "deadline_asc"
+
+  let session: Awaited<ReturnType<typeof auth.api.getSession>> = null
+  let profile: { age: number | null; gradeLevel: number | null } | null = null
+  session = await auth.api.getSession({ headers: await headers() })
+  if (session) {
+    profile = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { age: true, gradeLevel: true },
+    })
+  }
+
+  const effectiveGradeFilter = fitFilter && profile?.gradeLevel != null
+    ? String(profile.gradeLevel)
+    : gradeFilter
+  const effectiveAgeFilter = fitFilter && profile?.age != null
+    ? String(profile.age)
+    : ageFilter
 
   // Build Prisma query
   const whereClause: Prisma.ActivityWhereInput = {}
@@ -65,12 +88,22 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     whereClause.isClosed = true
   }
 
-  if (gradeFilter !== "ALL") {
-    const gradeNum = parseInt(gradeFilter, 10)
+  if (effectiveGradeFilter !== "ALL") {
+    const gradeNum = parseInt(effectiveGradeFilter, 10)
     if (!isNaN(gradeNum)) {
       whereClause.gradeLevels = {
         has: gradeNum,
       }
+    }
+  }
+
+  if (effectiveAgeFilter !== "ALL") {
+    const ageNum = parseInt(effectiveAgeFilter, 10)
+    if (!isNaN(ageNum)) {
+      whereClause.AND = [
+        { OR: [{ minAge: null }, { minAge: { lte: ageNum } }] },
+        { OR: [{ maxAge: null }, { maxAge: { gte: ageNum } }] },
+      ]
     }
   }
 
@@ -132,7 +165,9 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     searchQuery !== "" ||
     categoryFilter !== "ALL" ||
     seasonFilter !== "ALL" ||
+    ageFilter !== "ALL" ||
     gradeFilter !== "ALL" ||
+    fitFilter ||
     prestigiousFilter !== "ALL" ||
     statusFilter !== "ALL" ||
     sortOption !== "deadline_asc"
@@ -175,6 +210,19 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
           <p className="text-base sm:text-lg text-[#2B0510]/75 max-w-2xl mx-auto font-medium">
             <T k="activities.description" />
           </p>
+          {session && (profile?.age != null || profile?.gradeLevel != null) && (
+            <Link
+              href="/activities?fit=me"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFE5B4] hover:bg-[#FFD98A] text-[#7B1B38] rounded-full text-sm font-bold transition-colors"
+            >
+              <T k="activities.forMe" />
+            </Link>
+          )}
+          {fitFilter && session && profile?.age === null && profile?.gradeLevel === null && (
+            <p className="text-sm text-[#7B1B38] font-semibold">
+              <T k="activities.completeProfile" />
+            </p>
+          )}
         </div>
 
         {/* Filter Toolbar Component */}
@@ -194,7 +242,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             </div>
 
             {/* Filter Dropdowns Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
               {/* Sort Option */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1 flex items-center gap-1">
@@ -257,14 +305,30 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 </label>
                 <select
                   name="grade"
-                  defaultValue={gradeFilter}
+                  defaultValue={effectiveGradeFilter}
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allGrades" /></option>
-                  <option value="9">9. <T k="activities.gradeWord" /></option>
-                  <option value="10">10. <T k="activities.gradeWord" /></option>
-                  <option value="11">11. <T k="activities.gradeWord" /></option>
-                  <option value="12">12. <T k="activities.gradeWord" /></option>
+                  {Array.from({ length: 16 }, (_, index) => index + 1).map((level) => (
+                    <option key={level} value={level}>{level}. <T k="activities.gradeWord" /></option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Age */}
+              <div>
+                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
+                  <T k="activities.age" />
+                </label>
+                <select
+                  name="age"
+                  defaultValue={effectiveAgeFilter}
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                >
+                  <option value="ALL"><T k="activities.allAges" /></option>
+                  {Array.from({ length: 8 }, (_, index) => index + 13).map((age) => (
+                    <option key={age} value={age}>{age} <T k="activities.ageWord" /></option>
+                  ))}
                 </select>
               </div>
 

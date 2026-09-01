@@ -16,6 +16,8 @@ export default function NewActivityPage() {
     description: "",
     category: "COMPETITION" as ActivityCategory,
     gradeLevels: [] as number[],
+    minAge: "",
+    maxAge: "",
     financialSupport: "B",
     entryPrice: "",
     scholarshipAmount: "",
@@ -199,6 +201,35 @@ export default function NewActivityPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+              Yaş Aralığı (opsiyonel)
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={formData.minAge}
+                onChange={(e) => setFormData({ ...formData, minAge: e.target.value })}
+                placeholder="Minimum yaş"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={formData.maxAge}
+                onChange={(e) => setFormData({ ...formData, maxAge: e.target.value })}
+                placeholder="Maksimum yaş"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+            </div>
+            <p className="mt-1 text-xs text-[#2B0510]/60">
+              Yaş kriteri yoksa alanları boş bırakabilirsiniz.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

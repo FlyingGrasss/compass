@@ -15,6 +15,7 @@ interface AdminUser {
   role: UserRole
   school: string | null
   gradeLevel: number | null
+  age: number | null
   createdAt: string
 }
 
@@ -154,6 +155,7 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4 text-sm text-[#2B0510]/75">
                         {user.school || "—"}
                         {user.gradeLevel ? ` · ${user.gradeLevel}. sınıf` : ""}
+                        {user.age ? ` · ${user.age} yaş` : ""}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#2B0510]/75">
                         {new Date(user.createdAt).toLocaleDateString("tr-TR")}

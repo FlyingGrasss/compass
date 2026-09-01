@@ -38,6 +38,18 @@ export const auth = betterAuth({
         input: false,
         returned: true,
       },
+      age: {
+        type: "number",
+        required: false,
+        input: true,
+        returned: true,
+      },
+      gradeLevel: {
+        type: "number",
+        required: false,
+        input: true,
+        returned: true,
+      },
     },
   },
   emailAndPassword: {

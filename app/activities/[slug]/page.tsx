@@ -197,9 +197,18 @@ export default async function ActivityDetailPage({
                 </div>
                 <div>
                     <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.targetGrades" /></p>
-                    <p className="font-bold text-sm">
+                  <p className="font-bold text-sm">
                     {activity.gradeLevels.map((l) => `${l}.`).join(", ")} <T k="detail.grades" />
                   </p>
+                  {(activity.minAge !== null || activity.maxAge !== null) && (
+                    <p className="font-bold text-sm mt-1">
+                      {activity.minAge !== null && activity.maxAge !== null
+                        ? `${activity.minAge}-${activity.maxAge}`
+                        : activity.minAge !== null
+                          ? `${activity.minAge}+`
+                          : `≤${activity.maxAge}`} <T k="detail.ages" />
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

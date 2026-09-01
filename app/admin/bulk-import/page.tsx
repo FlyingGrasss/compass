@@ -28,6 +28,8 @@ interface ParsedActivity {
   description?: string
   category?: string
   gradeLevels?: number[]
+  minAge?: number | null
+  maxAge?: number | null
   financialSupport?: string
   entryPrice?: number
   scholarshipAmount?: number | string
@@ -89,6 +91,8 @@ financialSupport skalası:
     "description": "Türkçe açıklama...\n\n[English Summary]\nEnglish summary...",
     "category": "COMPETITION" | "SCHOLARSHIP" | "VOLUNTEER" | "SUMMER_PROGRAM" | "SCHOOL_PROGRAM" | "PLATFORM",
     "gradeLevels": [9, 10, 11, 12],
+    "minAge": 13,
+    "maxAge": 20,
     "financialSupport": "A+" | "A" | "B" | "C" | "D",
     "entryPrice": 0,
     "scholarshipAmount": "Tam burs + yasam gideri",

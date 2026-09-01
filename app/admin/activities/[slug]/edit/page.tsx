@@ -20,6 +20,8 @@ export default function EditActivityPage() {
     description: "",
     category: "COMPETITION" as ActivityCategory,
     gradeLevels: [] as number[],
+    minAge: "",
+    maxAge: "",
     financialSupport: "B",
     entryPrice: "",
     scholarshipAmount: "",
@@ -35,47 +37,57 @@ export default function EditActivityPage() {
   })
 
   useEffect(() => {
-    fetchActivity()
-  }, [slug])
+    let cancelled = false
 
-  const fetchActivity = async () => {
-    try {
-      const response = await fetch(`/api/admin/activities/${slug}`)
-      if (!response.ok) throw new Error()
+    const loadActivity = async () => {
+      try {
+        const response = await fetch(`/api/admin/activities/${slug}`)
+        if (!response.ok) throw new Error()
 
-      const activity: Activity = await response.json()
+        const activity: Activity = await response.json()
+        if (cancelled) return
 
-      setFormData({
-        name: activity.name,
-        description: activity.description,
-        category: activity.category,
-        gradeLevels: activity.gradeLevels,
-        financialSupport: activity.financialSupport,
-        entryPrice:
-          activity.entryPrice != null ? String(activity.entryPrice) : "",
-        scholarshipAmount:
-          activity.scholarshipAmount != null
-            ? String(activity.scholarshipAmount)
+        setFormData({
+          name: activity.name,
+          description: activity.description,
+          category: activity.category,
+          gradeLevels: activity.gradeLevels,
+          minAge: activity.minAge != null ? String(activity.minAge) : "",
+          maxAge: activity.maxAge != null ? String(activity.maxAge) : "",
+          financialSupport: activity.financialSupport,
+          entryPrice:
+            activity.entryPrice != null ? String(activity.entryPrice) : "",
+          scholarshipAmount:
+            activity.scholarshipAmount != null
+              ? String(activity.scholarshipAmount)
+              : "",
+          amountCurrency: activity.amountCurrency || "TRY",
+          isPrestigious: activity.isPrestigious,
+          season: activity.season,
+          duration: activity.duration,
+          deadline: activity.deadline
+            ? new Date(activity.deadline).toISOString().split("T")[0]
             : "",
-        amountCurrency: activity.amountCurrency || "TRY",
-        isPrestigious: activity.isPrestigious,
-        season: activity.season,
-        duration: activity.duration,
-        deadline: activity.deadline
-          ? new Date(activity.deadline).toISOString().split("T")[0]
-          : "",
-        location: activity.location || "",
-        requirements: activity.requirements || "",
-        website: activity.website || "",
-        imageUrl: activity.imageUrl || "",
-      })
-    } catch (error) {
-      toast.error("Etkinlik yüklenemedi")
-      router.push("/admin/activities")
-    } finally {
-      setIsLoading(false)
+          location: activity.location || "",
+          requirements: activity.requirements || "",
+          website: activity.website || "",
+          imageUrl: activity.imageUrl || "",
+        })
+      } catch {
+        if (!cancelled) {
+          toast.error("Etkinlik yüklenemedi")
+          router.push("/admin/activities")
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
     }
-  }
+
+    void loadActivity()
+    return () => {
+      cancelled = true
+    }
+  }, [slug, router])
 
   const generateSlug = (name: string) => {
     return name
@@ -254,6 +266,35 @@ export default function EditActivityPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#2B0510] mb-1.5">
+              Yaş Aralığı (opsiyonel)
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={formData.minAge}
+                onChange={(e) => setFormData({ ...formData, minAge: e.target.value })}
+                placeholder="Minimum yaş"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={formData.maxAge}
+                onChange={(e) => setFormData({ ...formData, maxAge: e.target.value })}
+                placeholder="Maksimum yaş"
+                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
+              />
+            </div>
+            <p className="mt-1 text-xs text-[#2B0510]/60">
+              Yaş kriteri yoksa alanları boş bırakabilirsiniz.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

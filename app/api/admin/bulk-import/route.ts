@@ -5,6 +5,7 @@ import { auth } from "@/auth"
 import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { ActivityCategory, ActivitySeason } from "@prisma/client"
+import { parseAgeRange } from "@/lib/activity-eligibility"
 
 const generateSlug = (name: string): string => {
   return name
@@ -85,6 +86,10 @@ export async function POST(req: NextRequest) {
       const slug = (act.slug || generateSlug(name)).trim()
       const description = (act.description || "").trim()
       const category = mapCategory(act.category || "COMPETITION")
+      const { minAge, maxAge } = parseAgeRange(
+        act.minAge ?? act.ageMin,
+        act.maxAge ?? act.ageMax,
+      )
       
       // Parse grade levels
       let gradeLevels: number[] = [9, 10, 11, 12]
@@ -128,6 +133,8 @@ export async function POST(req: NextRequest) {
         description,
         category,
         gradeLevels,
+        minAge,
+        maxAge,
         financialSupport: String(act.financialSupport || "B").toUpperCase().trim(),
         entryPrice: isNaN(entryPrice as number) ? null : entryPrice,
         scholarshipAmount:
