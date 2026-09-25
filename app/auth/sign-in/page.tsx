@@ -15,6 +15,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [signInError, setSignInError] = useState<string | null>(null)
   const { t } = useLanguage()
 
   // Redirect to profile if already logged in
@@ -26,6 +27,7 @@ export default function SignInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSignInError(null)
     setIsLoading(true)
 
     try {
@@ -40,10 +42,15 @@ export default function SignInPage() {
             router.push("/profile")
           },
           onError: () => {
+            setSignInError("auth.invalidCredentials")
             toast.error(t("auth.invalidCredentials"))
           },
         }
       )
+    } catch {
+      const message = t("auth.signInError")
+      setSignInError("auth.signInError")
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -74,7 +81,22 @@ export default function SignInPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            aria-describedby={signInError ? "sign-in-error" : undefined}
+            className="space-y-4"
+          >
+            {signInError && (
+              <div
+                id="sign-in-error"
+                role="alert"
+                aria-live="assertive"
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
+                <T k={signInError} />
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-[#2B0510] mb-1.5">
                 <T k="auth.email" />
