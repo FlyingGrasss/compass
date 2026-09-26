@@ -7,6 +7,18 @@ import { prisma } from "@/lib/prisma"
 import { ActivityCategory, ActivitySeason } from "@prisma/client"
 import { parseAgeRange } from "@/lib/activity-eligibility"
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
+const optionalString = (value: unknown): string | null => {
+  if (typeof value !== "string") return null
+  const normalized = value.trim()
+  return normalized || null
+}
+
+const getErrorMessage = (error: unknown, fallback: string): string =>
+  error instanceof Error ? error.message : fallback
+
 const generateSlug = (name: string): string => {
   return name
     .replace(/İ/g, "i")
@@ -62,8 +74,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Parse Body and retrieve activities array
-    const body = await req.json()
-    const rawActivities = Array.isArray(body) ? body : body?.activities
+    const body: unknown = await req.json()
+    const rawActivities = Array.isArray(body)
+      ? body
+      : isRecord(body)
+        ? body.activities
+        : undefined
 
     if (!rawActivities || !Array.isArray(rawActivities)) {
       return NextResponse.json(
@@ -77,15 +93,16 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Normalize activities and prepare bulk transaction operations
-    const operations = rawActivities.map((act: any) => {
-      const name = (act.name || act.title || "").trim()
+    const operations = rawActivities.map((rawActivity: unknown) => {
+      const act = isRecord(rawActivity) ? rawActivity : {}
+      const name = String(act.name ?? act.title ?? "").trim()
       if (!name) {
         throw new Error("Etkinlik adı ('title' veya 'name') boş olamaz.")
       }
 
-      const slug = (act.slug || generateSlug(name)).trim()
-      const description = (act.description || "").trim()
-      const category = mapCategory(act.category || "COMPETITION")
+      const slug = String(act.slug ?? generateSlug(name)).trim()
+      const description = String(act.description ?? "").trim()
+      const category = mapCategory(String(act.category ?? "COMPETITION"))
       const { minAge, maxAge } = parseAgeRange(
         act.minAge ?? act.ageMin,
         act.maxAge ?? act.ageMax,
@@ -94,7 +111,7 @@ export async function POST(req: NextRequest) {
       // Parse grade levels
       let gradeLevels: number[] = [9, 10, 11, 12]
       if (Array.isArray(act.gradeLevels)) {
-        gradeLevels = act.gradeLevels.map(Number).filter((n: number) => !isNaN(n))
+        gradeLevels = act.gradeLevels.map(Number).filter((n) => !Number.isNaN(n))
       } else if (typeof act.gradeLevels === "number") {
         gradeLevels = [act.gradeLevels]
       } else if (typeof act.gradeLevels === "string") {
@@ -106,7 +123,7 @@ export async function POST(req: NextRequest) {
             for (let i = start; i <= end; i++) gradeLevels.push(i)
           }
         } else {
-          gradeLevels = act.gradeLevels.split(",").map(Number).filter((n: number) => !isNaN(n))
+          gradeLevels = act.gradeLevels.split(",").map(Number).filter((n) => !Number.isNaN(n))
         }
       }
 
@@ -124,9 +141,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Numerical prices
-      const entryPrice = act.entryPrice !== undefined && act.entryPrice !== null ? Number(act.entryPrice) : null
+      const entryPriceValue =
+        act.entryPrice !== undefined && act.entryPrice !== null
+          ? Number(act.entryPrice)
+          : null
+      const entryPrice =
+        entryPriceValue === null || !Number.isNaN(entryPriceValue)
+          ? entryPriceValue
+          : null
 
-      const deadline = act.deadline ? new Date(act.deadline) : null
+      const deadline = act.deadline ? new Date(String(act.deadline)) : null
 
       const dataToSave = {
         name,
@@ -135,22 +159,22 @@ export async function POST(req: NextRequest) {
         gradeLevels,
         minAge,
         maxAge,
-        financialSupport: String(act.financialSupport || "B").toUpperCase().trim(),
-        entryPrice: isNaN(entryPrice as number) ? null : entryPrice,
+        financialSupport: String(act.financialSupport ?? "B").toUpperCase().trim(),
+        entryPrice,
         scholarshipAmount:
           act.scholarshipAmount === "" || act.scholarshipAmount == null
             ? null
             : String(act.scholarshipAmount),
-        amountCurrency: String(act.amountCurrency || "TRY").toUpperCase().trim(),
-        isPrestigious: !!act.isPrestigious,
-        isClosed: !!act.isClosed,
-        season: mapSeason(act.season || "YEAR_ROUND"),
-        duration: String(act.duration || "Belirtilmedi").trim(),
-        deadline: deadline && !isNaN(deadline.getTime()) ? deadline : null,
-        location: act.location ? String(act.location).trim() : null,
+        amountCurrency: String(act.amountCurrency ?? "TRY").toUpperCase().trim(),
+        isPrestigious: Boolean(act.isPrestigious),
+        isClosed: Boolean(act.isClosed),
+        season: mapSeason(String(act.season ?? "YEAR_ROUND")),
+        duration: String(act.duration ?? "Belirtilmedi").trim(),
+        deadline: deadline && !Number.isNaN(deadline.getTime()) ? deadline : null,
+        location: optionalString(act.location),
         requirements,
-        website: act.website || act.link || null,
-        imageUrl: act.imageUrl || null,
+        website: optionalString(act.website) ?? optionalString(act.link),
+        imageUrl: optionalString(act.imageUrl),
       }
 
       return prisma.activity.upsert({
@@ -171,10 +195,10 @@ export async function POST(req: NextRequest) {
       count: results.length,
       message: `Başarıyla ${results.length} etkinlik veritabanı ile senkronize edildi.`,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Bulk Import Error:", error)
     return NextResponse.json(
-      { error: error.message || "İçe aktarma işlemi sırasında bir hata oluştu." },
+      { error: getErrorMessage(error, "İçe aktarma işlemi sırasında bir hata oluştu.") },
       { status: 500 }
     )
   }

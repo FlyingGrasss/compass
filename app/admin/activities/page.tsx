@@ -4,16 +4,14 @@
 
 import Link from "next/link"
 import { Plus, Edit, Trash2, Search } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
 import type { Activity } from "@prisma/client"
 import { formatAmount } from "@/lib/format-amount"
+import ActivityImage from "@/components/ActivityImage"
 
 export default function AdminActivitiesPage() {
-  const router = useRouter()
   const [activities, setActivities] = useState<Activity[]>([])
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL")
   const [isLoading, setIsLoading] = useState(true)
@@ -27,11 +25,33 @@ export default function AdminActivitiesPage() {
     PLATFORM: "Platform",
   }
 
-  useEffect(() => {
-    fetchActivities()
+  const fetchActivities = useCallback(async () => {
+    const response = await fetch("/api/admin/activities")
+    if (!response.ok) throw new Error("Etkinlikler yüklenemedi")
+    return response.json() as Promise<Activity[]>
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+
+    void fetchActivities()
+      .then((data) => {
+        if (cancelled) return
+        setActivities(data)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        toast.error("Etkinlikler yüklenemedi")
+        setIsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [fetchActivities])
+
+  const filteredActivities = useMemo(() => {
     let filtered = activities
 
     if (categoryFilter !== "ALL") {
@@ -46,21 +66,8 @@ export default function AdminActivitiesPage() {
       )
     }
 
-    setFilteredActivities(filtered)
+    return filtered
   }, [searchQuery, categoryFilter, activities])
-
-  const fetchActivities = async () => {
-    try {
-      const response = await fetch("/api/admin/activities")
-      const data = await response.json()
-      setActivities(data)
-      setFilteredActivities(data)
-    } catch (error) {
-      toast.error("Etkinlikler yüklenemedi")
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const handleDelete = async (slug: string) => {
     if (!confirm("Bu etkinliği silmek istediğinize emin misiniz?")) return
@@ -73,8 +80,9 @@ export default function AdminActivitiesPage() {
       if (!response.ok) throw new Error()
 
       toast.success("Etkinlik silindi")
-      fetchActivities()
-    } catch (error) {
+      const data = await fetchActivities()
+      setActivities(data)
+    } catch {
       toast.error("Etkinlik silinemedi")
     }
   }
@@ -156,20 +164,11 @@ export default function AdminActivitiesPage() {
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
               >
                 <div>
-                  {activity.imageUrl && (
-                    <img
-                      src={activity.imageUrl}
-                      alt={activity.name}
-                      className="w-full h-48 object-cover"
-                    />
-                  )}
-                  {!activity.imageUrl && (
-                    <div className="w-full h-48 bg-[#FFE5B4]/30 flex items-center justify-center border-b border-[#FFE5B4]/20">
-                      <span className="text-[#2B0510]/40 text-sm font-semibold">
-                        Görsel yok
-                      </span>
-                    </div>
-                  )}
+                  <ActivityImage
+                    src={activity.imageUrl}
+                    alt={activity.name}
+                    className="w-full h-48 object-cover"
+                  />
                   <div className="p-6 space-y-4">
                     <div>
                       <h3 className="text-lg font-bold text-[#2B0510] mb-1 line-clamp-1">

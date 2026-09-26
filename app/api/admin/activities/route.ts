@@ -6,6 +6,7 @@ import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { parseAmount } from "@/lib/format-amount"
 import { parseAgeRange } from "@/lib/activity-eligibility"
+import { getLocationTags, normalizeLocation } from "@/lib/activity-location"
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +45,8 @@ export async function POST(req: NextRequest) {
         season: data.season,
         duration: data.duration,
         deadline: data.deadline ? new Date(data.deadline) : null,
-        location: data.location || null,
+        location: normalizeLocation(data.location),
+        locationTags: getLocationTags(data.location),
         requirements: data.requirements || null,
         website: data.website || null,
         imageUrl: data.imageUrl || null,

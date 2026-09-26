@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { 
@@ -45,12 +45,36 @@ interface ParsedActivity {
   imageUrl?: string
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
+const sanitizeMarkdownLinks = (str: string): string => {
+  if (!str) return str
+  return str.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$2")
+}
+
+const sanitizeActivity = (item: unknown): ParsedActivity => {
+  if (!isRecord(item)) return {}
+
+  const activity = item as ParsedActivity
+  return {
+    ...activity,
+    link: typeof activity.link === "string"
+      ? sanitizeMarkdownLinks(activity.link)
+      : activity.link,
+    website: typeof activity.website === "string"
+      ? sanitizeMarkdownLinks(activity.website)
+      : activity.website,
+  }
+}
+
+const getErrorMessage = (error: unknown, fallback: string): string =>
+  error instanceof Error ? error.message : fallback
+
 export default function BulkImportPage() {
   const router = useRouter()
   const [jsonInput, setJsonInput] = useState("")
   const [existingSlugs, setExistingSlugs] = useState<string[]>([])
-  const [parsedData, setParsedData] = useState<ParsedActivity[]>([])
-  const [jsonError, setJsonError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   const [status, setStatus] = useState<{
@@ -141,7 +165,7 @@ Gerçek örnek (bu formatı birebir taklit et):
       setCopied(true)
       toast.success("Sistem istemi panoya kopyalandı!")
       setTimeout(() => setCopied(false), 3000)
-    } catch (err) {
+    } catch {
       toast.error("Panoya kopyalanamadı.")
     }
   }
@@ -150,47 +174,37 @@ Gerçek örnek (bu formatı birebir taklit et):
     try {
       await navigator.clipboard.writeText(JSON.stringify(existingSlugs));
       toast.success("Slug'lar panoya kopyalandı!");
-    } catch (err) {
+    } catch {
       toast.error("Slug'lar kopyalanamadı.");
     }
   };
-
-  // Strip markdown link formatting [text](url) -> url
-  const sanitizeMarkdownLinks = (str: string): string => {
-    if (!str) return str
-    return str.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$2')
-  }
-
-  // Sanitize all string/URL fields in a parsed activity
-  const sanitizeActivity = (item: ParsedActivity): ParsedActivity => {
-    return {
-      ...item,
-      link: item.link ? sanitizeMarkdownLinks(item.link) : item.link,
-      website: item.website ? sanitizeMarkdownLinks(item.website) : item.website,
-    }
-  }
 
   // Fetch existing slugs for copy button
   useEffect(() => {
     const fetchSlugs = async () => {
       try {
         const res = await fetch("/api/admin/activities");
-        const data = await res.json();
-        const slugs = data.map((a: any) => a.slug).filter(Boolean);
+        const data: unknown = await res.json();
+        const slugs = Array.isArray(data)
+          ? data.flatMap((item) => {
+              if (!isRecord(item) || typeof item.slug !== "string") return []
+              return [item.slug]
+            })
+          : []
         setExistingSlugs(slugs);
       } catch (e) {
         console.error("Slug fetch error", e);
       }
     };
-    fetchSlugs();
+    void fetchSlugs();
   }, []);
 
-  // Real-time JSON validation and parsing
-  useEffect(() => {
+  const { parsedData, jsonError } = useMemo<{
+    parsedData: ParsedActivity[]
+    jsonError: string | null
+  }>(() => {
     if (!jsonInput.trim()) {
-      setParsedData([])
-      setJsonError(null)
-      return
+      return { parsedData: [], jsonError: null }
     }
 
     try {
@@ -201,17 +215,23 @@ Gerçek örnek (bu formatı birebir taklit et):
         cleanInput = codeBlockMatch[1].trim()
       }
 
-      const parsed = JSON.parse(cleanInput)
+      const parsed: unknown = JSON.parse(cleanInput)
       if (!Array.isArray(parsed)) {
-        setJsonError("Veri kökü bir JSON dizisi (array) olmalıdır.")
-        setParsedData([])
-      } else {
-        setJsonError(null)
-        setParsedData(parsed.map(sanitizeActivity))
+        return {
+          parsedData: [],
+          jsonError: "Veri kökü bir JSON dizisi (array) olmalıdır.",
+        }
       }
-    } catch (err: any) {
-      setJsonError(err.message || "Geçersiz JSON formatı.")
-      setParsedData([])
+
+      return {
+        parsedData: parsed.map(sanitizeActivity),
+        jsonError: null,
+      }
+    } catch (error: unknown) {
+      return {
+        parsedData: [],
+        jsonError: getErrorMessage(error, "Geçersiz JSON formatı."),
+      }
     }
   }, [jsonInput])
 
@@ -248,9 +268,10 @@ Gerçek örnek (bu formatı birebir taklit et):
         router.push("/admin/bulk-import")
         router.refresh()
       }, 2000)
-    } catch (err: any) {
-      setStatus({ type: "error", message: err.message || "Senkronizasyon başarısız oldu." })
-      toast.error(err.message || "İçe aktarım sırasında hata oluştu.")
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Senkronizasyon başarısız oldu.")
+      setStatus({ type: "error", message })
+      toast.error(message)
     }
   }
 
@@ -312,7 +333,7 @@ Gerçek örnek (bu formatı birebir taklit et):
                 Hemen altına araştırdığınız etkinlik taslaklarını, ham metinleri veya linkleri ekleyin.
               </li>
               <li>
-                AI'ın ürettiği temiz <strong className="font-mono bg-white/70 px-1 py-0.5 rounded border border-[#FFE5B4]">JSON</strong> dizisini kopyalayın.
+                 AI&apos;ın ürettiği temiz <strong className="font-mono bg-white/70 px-1 py-0.5 rounded border border-[#FFE5B4]">JSON</strong> dizisini kopyalayın.
               </li>
               <li>
                 Sağdaki metin alanına yapıştırın ve verileri canlı olarak önizleyin.
@@ -340,7 +361,7 @@ Gerçek örnek (bu formatı birebir taklit et):
               className="w-full flex items-center justify-center gap-2.5 px-5 py-3.5 bg-[#7B1B38] hover:bg-[#5A1127] text-white font-bold rounded-xl transition-all shadow-sm active:scale-[0.98] cursor-pointer mt-2"
             >
               <Copy className="w-5 h-5" />
-              Slug'ları Kopyala
+               Slug&apos;ları Kopyala
             </button>
           </div>
 
@@ -351,7 +372,7 @@ Gerçek örnek (bu formatı birebir taklit et):
               Upsert Mantığı Nedir?
             </h4>
             <p className="text-xs text-[#2B0510]/70 leading-relaxed">
-              Sistem etkinlikleri <strong className="text-[#7B1B38]">slug</strong> değerine göre eşleştirir. Eğer veritabanında aynı slug'a sahip bir etkinlik varsa onu <strong>günceller</strong> (update), yoksa <strong>yeni</strong> bir kayıt oluşturur (create). Bu sayede veri çoğaltma hatası olmadan güncellemeleri güvenle yapabilirsiniz.
+               Sistem etkinlikleri <strong className="text-[#7B1B38]">slug</strong> değerine göre eşleştirir. Eğer veritabanında aynı slug&apos;a sahip bir etkinlik varsa onu <strong>günceller</strong> (update), yoksa <strong>yeni</strong> bir kayıt oluşturur (create). Bu sayede veri çoğaltma hatası olmadan güncellemeleri güvenle yapabilirsiniz.
             </p>
           </div>
         </div>
@@ -385,9 +406,9 @@ Gerçek örnek (bu formatı birebir taklit et):
               <div className="flex items-start gap-3 bg-red-50 border-2 border-red-300 rounded-xl px-4 py-3 animate-pulse">
                 <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
                 <div className="text-sm">
-                  <p className="font-extrabold text-red-700">Geçersiz JSON — Gemini'ye geri dönüp tekrar dene!</p>
+                   <p className="font-extrabold text-red-700">Geçersiz JSON — Gemini&apos;ye geri dönüp tekrar dene!</p>
                   <p className="text-red-600 font-mono text-xs mt-1 break-all">{jsonError}</p>
-                  <p className="text-red-500 text-xs mt-1">İpucu: Gemini'ye "JSON hatalı, düzelt ve tekrar ver" yaz.</p>
+                   <p className="text-red-500 text-xs mt-1">İpucu: Gemini&apos;ye &quot;JSON hatalı, düzelt ve tekrar ver&quot; yaz.</p>
                 </div>
               </div>
             )}

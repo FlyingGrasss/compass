@@ -8,6 +8,8 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { LanguageProvider } from "@/lib/i18n"
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,11 +34,11 @@ export const metadata: Metadata = {
     "gönüllülük",
   ],
   authors: [{ name: "YouthCompass" }],
-  metadataBase: new URL("https://snowday-flax.vercel.app"),
+  metadataBase: new URL(appUrl),
   openGraph: {
     type: "website",
     locale: "tr_TR",
-    url: "https://snowday-flax.vercel.app",
+    url: appUrl,
     title: "YouthCompass - Staj ve Fırsatlar Platformu",
     description:
       "Türkiye'deki lise ve üniversite öğrencileri için staj, yarışma, gönüllülük ve gelişim fırsatları platformu.",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { LOCATION_TAGS, type LocationTag } from "@/lib/activity-location"
 
 const parseOptionalInteger = (value: unknown, min: number, max: number) => {
   if (value === null || value === undefined || value === "") return null
@@ -9,6 +10,13 @@ const parseOptionalInteger = (value: unknown, min: number, max: number) => {
   const parsed = Number(value)
   if (!Number.isInteger(parsed) || parsed < min || parsed > max) return undefined
   return parsed
+}
+
+const parsePreferredLocations = (value: unknown): LocationTag[] => {
+  if (!Array.isArray(value)) return []
+  return [...new Set(value.filter((item): item is LocationTag =>
+    typeof item === "string" && LOCATION_TAGS.includes(item as LocationTag)
+  ))]
 }
 
 async function getCurrentUser() {
@@ -24,6 +32,7 @@ async function getCurrentUser() {
       school: true,
       age: true,
       gradeLevel: true,
+      preferredLocations: true,
     },
   })
 }
@@ -47,6 +56,7 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json()
     const age = parseOptionalInteger(body?.age, 1, 100)
     const gradeLevel = parseOptionalInteger(body?.gradeLevel, 1, 16)
+    const preferredLocations = parsePreferredLocations(body?.preferredLocations)
 
     if (age === undefined || gradeLevel === undefined) {
       return NextResponse.json(
@@ -57,7 +67,7 @@ export async function PATCH(req: NextRequest) {
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: { age, gradeLevel },
+      data: { age, gradeLevel, preferredLocations },
       select: {
         id: true,
         name: true,
@@ -65,6 +75,7 @@ export async function PATCH(req: NextRequest) {
         school: true,
         age: true,
         gradeLevel: true,
+        preferredLocations: true,
       },
     })
 

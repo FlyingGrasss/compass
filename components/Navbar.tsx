@@ -6,7 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useSession, signOut } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { Compass, Menu, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { useLanguage } from "@/lib/i18n"
@@ -51,6 +51,16 @@ export default function Navbar() {
             >
               {t("nav.scholarships")}
             </Link>
+
+            {session && (
+              <Link
+                href="/activities?fit=me"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#FFE5B4] px-3 py-2 text-sm font-black text-[#7B1B38] shadow-xs hover:bg-[#FFD98A] transition-colors cursor-pointer"
+              >
+                <Compass className="w-4 h-4" />
+                {t("nav.findMatches")}
+              </Link>
+            )}
 
             <Link
               href="/about"
@@ -163,6 +173,17 @@ export default function Navbar() {
             >
               {t("nav.scholarships")}
             </Link>
+
+            {session && (
+              <Link
+                href="/activities?fit=me"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-black text-[#7B1B38] bg-[#FFE5B4] hover:bg-[#FFD98A] rounded-xl transition-colors cursor-pointer"
+                onClick={() => setIsOpen(false)}
+              >
+                <Compass className="w-4 h-4" />
+                {t("nav.findMatches")}
+              </Link>
+            )}
 
             <Link
               href="/about"

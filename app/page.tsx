@@ -6,8 +6,9 @@ import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Briefcase, Users, Search, GraduationCap, ArrowRight, DollarSign } from "lucide-react"
+import { Briefcase, Users, Search, GraduationCap, ArrowRight, DollarSign, Compass } from "lucide-react"
 import { LocaleText, useLanguage } from "@/lib/i18n"
+import { useSession } from "@/lib/auth-client"
 
 function HomeContent() {
   const router = useRouter()
@@ -15,6 +16,7 @@ function HomeContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "")
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "ALL")
   const { t } = useLanguage()
+  const { data: session } = useSession()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -138,6 +140,13 @@ function HomeContent() {
                 className="px-8 py-3 bg-[#FFE5B4] hover:bg-[#FFD48F] text-[#7B1B38] font-bold rounded-xl transition-all shadow-xs cursor-pointer"
               >
                 {t("home.viewScholarshipGuide")}
+              </Link>
+              <Link
+                href={session ? "/activities?fit=me" : "/auth/sign-up"}
+                className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-[#FFF9F0] text-[#7B1B38] font-black rounded-xl border-2 border-[#7B1B38]/20 hover:border-[#7B1B38] transition-all shadow-xs cursor-pointer"
+              >
+                <Compass className="w-4 h-4" />
+                {t("home.findMatches")}
               </Link>
             </div>
           </div>

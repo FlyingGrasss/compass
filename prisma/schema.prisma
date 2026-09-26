@@ -18,6 +18,7 @@ model User {
   gradeLevel    Int?
   age           Int?
   role          UserRole  @default(USER)
+  preferredLocations String[] @default([])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
@@ -91,6 +92,7 @@ model Activity {
   duration        String
   deadline        DateTime?
   location        String?
+  locationTags    String[]          @default([])
   requirements    String?          @db.Text
   website         String?
   imageUrl        String?

@@ -15,6 +15,7 @@ import { ActivityCategory } from "@prisma/client"
 import Link from "next/link"
 import { formatAmount } from "@/lib/format-amount"
 import { LocalizedDescription, LocaleText, T } from "@/lib/i18n"
+import ActivityImage from "@/components/ActivityImage"
 
 export default async function ActivityDetailPage({
   params,
@@ -53,6 +54,10 @@ export default async function ActivityDetailPage({
     C: { tr: "Sınırlı Burs / Çekiliş", en: "Limited funding / Drawing" },
     D: { tr: "Burssuz", en: "Unfunded" },
   }
+  const now = new Date()
+  const isEffectivelyClosed = activity.isClosed || Boolean(
+    activity.deadline && new Date(activity.deadline).getTime() < now.getTime()
+  )
 
   return (
     <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0]">
@@ -65,13 +70,11 @@ export default async function ActivityDetailPage({
         </Link>
 
         <div className="bg-white rounded-3xl border border-[#F1E2D9] shadow-xl overflow-hidden">
-          {activity.imageUrl && (
-            <img
-              src={activity.imageUrl}
-              alt={activity.name}
-              className="w-full h-80 sm:h-96 object-cover"
-            />
-          )}
+          <ActivityImage
+            src={activity.imageUrl}
+            alt={activity.name}
+            className="w-full h-80 sm:h-96 object-cover"
+          />
 
           <div className="p-8 space-y-8">
             <div>
@@ -85,7 +88,7 @@ export default async function ActivityDetailPage({
                     <T k="activities.prestigious" />
                   </span>
                 )}
-                {activity.isClosed ? (
+                {isEffectivelyClosed ? (
                   <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-700">
                     <T k="detail.closed" />
                   </span>

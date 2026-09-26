@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { Search, Filter, Calendar, MapPin, DollarSign, Award, ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
 import { Prisma } from "@prisma/client"
 import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
+import ActivityImage from "@/components/ActivityImage"
 
 export const metadata = {
   title: "Burslar & Burs Rehberi | YouthCompass",
@@ -25,45 +26,46 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
   const statusFilter = (await searchParams).status || "all"
   const eligibilityFilter = (await searchParams).eligibility || "all"
   const prestigiousFilter = (await searchParams).prestigious || "all"
+  const now = new Date()
 
   // Build prisma query
   const whereClause: Prisma.ActivityWhereInput = {
     category: "SCHOLARSHIP",
   }
+  const andConditions: Prisma.ActivityWhereInput[] = []
 
   if (searchQuery) {
-    whereClause.OR = [
-      { name: { contains: searchQuery, mode: "insensitive" } },
-      { description: { contains: searchQuery, mode: "insensitive" } },
-      { requirements: { contains: searchQuery, mode: "insensitive" } },
-    ]
+    andConditions.push({
+      OR: [
+        { name: { contains: searchQuery, mode: "insensitive" } },
+        { description: { contains: searchQuery, mode: "insensitive" } },
+        { requirements: { contains: searchQuery, mode: "insensitive" } },
+      ],
+    })
   }
 
   if (statusFilter === "open") {
-    whereClause.isClosed = false
+    andConditions.push(
+      { isClosed: false },
+      { OR: [{ deadline: null }, { deadline: { gte: now } }] },
+    )
   } else if (statusFilter === "closed") {
-    whereClause.isClosed = true
+    andConditions.push({ OR: [{ isClosed: true }, { deadline: { lt: now } }] })
   }
 
   if (eligibilityFilter === "global") {
-    whereClause.OR = [
-      { location: { contains: "global", mode: "insensitive" } },
-      { location: { contains: "küresel", mode: "insensitive" } },
-      { location: { contains: "oxford", mode: "insensitive" } },
-      { location: { contains: "ingiltere", mode: "insensitive" } },
-      { location: null },
-    ]
+    andConditions.push({
+      locationTags: { hasSome: ["GLOBAL", "UK", "EUROPE", "TURKEY", "ONLINE", "UNSPECIFIED"] },
+    })
   } else if (eligibilityFilter === "us") {
-    whereClause.OR = [
-      { location: { contains: "abd", mode: "insensitive" } },
-      { location: { contains: "amerika", mode: "insensitive" } },
-      { location: { contains: "united states", mode: "insensitive" } },
-    ]
+    andConditions.push({ locationTags: { has: "USA" } })
   }
 
   if (prestigiousFilter === "true") {
     whereClause.isPrestigious = true
   }
+
+  if (andConditions.length > 0) whereClause.AND = andConditions
 
   const scholarships = await prisma.activity.findMany({
     where: whereClause,
@@ -209,6 +211,11 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 key={scholarship.id}
                 className={`bg-white rounded-2xl border ${scholarship.isPrestigious ? "border-[#FFE5B4]" : "border-[#F1E2D9]"} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group hover:-translate-y-1.5`}
               >
+                <ActivityImage
+                  src={scholarship.imageUrl}
+                  alt={scholarship.name}
+                  className="w-full h-44 object-cover"
+                />
                 {/* Prestigious Banner badge */}
                 {scholarship.isPrestigious && (
                   <div className="absolute top-0 right-0 bg-linear-to-l from-[#FFE5B4] to-[#FFF0D4] text-[#7B1B38] px-4 py-1.5 rounded-bl-xl text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 z-10 border-l border-b border-[#FFE5B4]">
@@ -221,7 +228,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                   {/* Status & Support */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Status Badge */}
-                    {scholarship.isClosed ? (
+                    {scholarship.isClosed || Boolean(scholarship.deadline && new Date(scholarship.deadline) < now) ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-bold">
                         <T k="scholarships.closedBadge" />
                       </span>

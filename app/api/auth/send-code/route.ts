@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import { Resend } from "resend"
+import { randomInt } from "node:crypto"
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -15,14 +16,30 @@ const prisma = new PrismaClient({ adapter })
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  return randomInt(100000, 1000000).toString()
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[character] || character)
 }
 
 export async function POST(request: NextRequest) {
   try {
     const { email, name } = await request.json()
 
-    if (!email || !name) {
+    if (
+      typeof email !== "string" ||
+      typeof name !== "string" ||
+      !email.trim() ||
+      !name.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
       return NextResponse.json(
         { error: "Email and name are required" },
         { status: 400 }
@@ -41,40 +58,42 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const recentCodeCount = await prisma.verification.count({
+      where: {
+        identifier: email,
+        createdAt: { gt: new Date(Date.now() - 10 * 60 * 1000) },
+      },
+    })
+
+    if (recentCodeCount >= 5) {
+      return NextResponse.json(
+        { error: "Çok fazla doğrulama kodu istendi. Lütfen daha sonra tekrar deneyin." },
+        { status: 429 },
+      )
+    }
+
     const verificationCode = generateVerificationCode()
 
     // Store verification code
-    await prisma.verification.upsert({
-      where: {
-        identifier_value: {
-          identifier: email,
-          value: verificationCode,
-        },
-      },
-      create: {
+    await prisma.verification.deleteMany({
+      where: { identifier: email, expiresAt: { lte: new Date() } },
+    })
+    await prisma.verification.create({
+      data: {
         identifier: email,
-        value: verificationCode,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-      },
-      update: {
         value: verificationCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       },
     })
 
-    console.log("==========================================")
-    console.log("📧 Verification code for", email)
-    console.log("🔢 Code:", verificationCode)
-    console.log("==========================================")
-
     try {
-      await resend.emails.send({
+      const { error: emailError } = await resend.emails.send({
         from: "snowday@balogrenci.org",
         to: email,
         subject: "E-posta Doğrulama Kodu",
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #7B1B38;">Hoş geldiniz, ${name}!</h2>
+            <h2 style="color: #7B1B38;">Hoş geldiniz, ${escapeHtml(name)}!</h2>
             <p style="color: #2B0510;">E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın:</p>
             <div style="background: #FFE5B4; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; border: 1px solid #F1E2D9;">
               <span style="font-size: 32px; font-weight: bold; color: #7B1B38; letter-spacing: 8px;">${verificationCode}</span>
@@ -83,9 +102,16 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       })
-      console.log("✅ Email sent successfully")
+      if (emailError) throw emailError
     } catch (error) {
       console.error("❌ Failed to send email:", error)
+      await prisma.verification.deleteMany({
+        where: { identifier: email, value: verificationCode },
+      })
+      return NextResponse.json(
+        { error: "Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin." },
+        { status: 502 },
+      )
     }
 
     return NextResponse.json({ success: true })

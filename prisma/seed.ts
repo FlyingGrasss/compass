@@ -5,6 +5,7 @@ import { PrismaClient, ActivityCategory, ActivitySeason } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import { competitions } from "./data/competitions"
+import { getLocationTags, normalizeLocation } from "../lib/activity-location"
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -444,7 +445,8 @@ async function main() {
         season: scholarship.season,
         duration: scholarship.duration,
         deadline: scholarship.deadline,
-        location: scholarship.location,
+        location: normalizeLocation(scholarship.location),
+        locationTags: getLocationTags(scholarship.location),
         requirements: scholarship.requirements,
         website: scholarship.website,
         imageUrl: scholarship.imageUrl,
@@ -464,7 +466,8 @@ async function main() {
         season: scholarship.season,
         duration: scholarship.duration,
         deadline: scholarship.deadline,
-        location: scholarship.location,
+        location: normalizeLocation(scholarship.location),
+        locationTags: getLocationTags(scholarship.location),
         requirements: scholarship.requirements,
         website: scholarship.website,
         imageUrl: scholarship.imageUrl,
@@ -494,7 +497,8 @@ async function main() {
         season: entry.season,
         duration: entry.duration,
         deadline: entry.deadline,
-        location: entry.location,
+        location: normalizeLocation(entry.location),
+        locationTags: getLocationTags(entry.location),
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,
@@ -515,7 +519,8 @@ async function main() {
         season: entry.season,
         duration: entry.duration,
         deadline: entry.deadline,
-        location: entry.location,
+        location: normalizeLocation(entry.location),
+        locationTags: getLocationTags(entry.location),
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,

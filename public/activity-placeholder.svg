@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">YouthCompass activity</title>
+  <desc id="desc">A YouthCompass branded placeholder for an activity image.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#7B1B38" />
+      <stop offset="1" stop-color="#D78B72" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF9" stop-opacity=".22" />
+      <stop offset="1" stop-color="#FFFDF9" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#background)" />
+  <circle cx="970" cy="125" r="260" fill="url(#glow)" />
+  <circle cx="170" cy="575" r="300" fill="#2B0510" fill-opacity=".16" />
+  <g fill="none" stroke="#FFFDF9" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="600" cy="315" r="118" stroke-width="14" opacity=".85" />
+    <path d="m600 205 35 110-35 110-35-110z" fill="#FFE5B4" stroke-width="10" />
+    <path d="M600 180v270M465 315h270" stroke-width="6" opacity=".55" />
+  </g>
+  <text x="600" y="545" text-anchor="middle" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="2">YouthCompass</text>
+</svg>

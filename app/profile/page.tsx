@@ -7,20 +7,23 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { User, Mail, GraduationCap, CalendarDays, Save, Compass } from "lucide-react"
-import { T, useLanguage } from "@/lib/i18n"
+import { LocaleText, T, useLanguage } from "@/lib/i18n"
+import { LOCATION_OPTIONS } from "@/lib/activity-location"
 
 type ProfileData = {
   age: number | null
   gradeLevel: number | null
+  preferredLocations: string[]
 }
 
 export default function ProfilePage() {
   const { data: session, isPending } = useSession()
   const { t } = useLanguage()
   const router = useRouter()
-  const [profile, setProfile] = useState<ProfileData>({ age: null, gradeLevel: null })
+  const [profile, setProfile] = useState<ProfileData>({ age: null, gradeLevel: null, preferredLocations: [] })
   const [ageInput, setAgeInput] = useState("")
   const [gradeInput, setGradeInput] = useState("")
+  const [locationInputs, setLocationInputs] = useState<string[]>([])
   const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   const [isSavingProfile, setIsSavingProfile] = useState(false)
 
@@ -43,6 +46,7 @@ export default function ProfilePage() {
         setProfile(data)
         setAgeInput(data.age == null ? "" : String(data.age))
         setGradeInput(data.gradeLevel == null ? "" : String(data.gradeLevel))
+        setLocationInputs(data.preferredLocations || [])
       } catch (error) {
         if (!cancelled) toast.error(error instanceof Error ? error.message : "Profil alınamadı")
       } finally {
@@ -67,6 +71,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           age: ageInput || null,
           gradeLevel: gradeInput || null,
+          preferredLocations: locationInputs,
         }),
       })
 
@@ -76,12 +81,20 @@ export default function ProfilePage() {
       setProfile(data)
       setAgeInput(data.age == null ? "" : String(data.age))
       setGradeInput(data.gradeLevel == null ? "" : String(data.gradeLevel))
+      setLocationInputs(data.preferredLocations || [])
       toast.success(t("profile.updated"))
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Profil güncellenemedi")
     } finally {
       setIsSavingProfile(false)
     }
+  }
+
+  const toggleLocation = (location: string) => {
+    setLocationInputs((current) => current.includes(location)
+      ? current.filter((item) => item !== location)
+      : [...current, location]
+    )
   }
 
   const handleSignOut = async () => {
@@ -193,6 +206,32 @@ export default function ProfilePage() {
               </label>
             </div>
 
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium text-[#2B0510]">
+                <T k="profile.locations" />
+              </legend>
+              <p className="text-xs text-[#2B0510]/60">
+                <T k="profile.locationsDescription" />
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {LOCATION_OPTIONS.filter((option) => !["OTHER", "UNSPECIFIED"].includes(option.value)).map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex items-center gap-2 rounded-lg border border-[#F1E2D9] bg-[#FFFDF9] px-3 py-2 text-sm text-[#2B0510] cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={locationInputs.includes(option.value)}
+                      onChange={() => toggleLocation(option.value)}
+                      disabled={isLoadingProfile || isSavingProfile}
+                      className="h-4 w-4 rounded border-[#F1E2D9] text-[#7B1B38] focus:ring-[#7B1B38]"
+                    />
+                    <LocaleText tr={option.tr} en={option.en} />
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
             <button
               type="submit"
               disabled={isLoadingProfile || isSavingProfile}
@@ -205,7 +244,7 @@ export default function ProfilePage() {
 
           {/* Actions */}
           <div className="flex flex-col gap-4 pt-4">
-            {(profile.age !== null || profile.gradeLevel !== null) && (
+            {(profile.age !== null || profile.gradeLevel !== null || profile.preferredLocations.length > 0) && (
               <button
                 onClick={() => {
                   const params = new URLSearchParams({ fit: "me" })

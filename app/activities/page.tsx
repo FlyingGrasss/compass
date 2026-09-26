@@ -4,9 +4,11 @@ import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { headers } from "next/headers"
-import { MapPin, Award, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
+import { MapPin, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
 import { ActivityCategory, ActivitySeason, Prisma } from "@prisma/client"
 import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
+import { LOCATION_OPTIONS } from "@/lib/activity-location"
+import ActivityImage from "@/components/ActivityImage"
 
 export const metadata = {
   title: "Tüm Fırsatlar & Etkinlikler | YouthCompass",
@@ -20,6 +22,7 @@ interface PageProps {
     season?: string
     grade?: string
     age?: string
+    location?: string
     fit?: string
     prestigious?: string
     status?: string
@@ -34,18 +37,20 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   const seasonFilter = resolvedSearchParams.season || "ALL"
   const gradeFilter = resolvedSearchParams.grade || "ALL"
   const ageFilter = resolvedSearchParams.age || "ALL"
+  const locationFilter = resolvedSearchParams.location || "ALL"
   const fitFilter = resolvedSearchParams.fit === "me"
   const prestigiousFilter = resolvedSearchParams.prestigious || "ALL"
   const statusFilter = resolvedSearchParams.status || "ALL"
   const sortOption = resolvedSearchParams.sort || "deadline_asc"
+  const now = new Date()
 
   let session: Awaited<ReturnType<typeof auth.api.getSession>> = null
-  let profile: { age: number | null; gradeLevel: number | null } | null = null
+  let profile: { age: number | null; gradeLevel: number | null; preferredLocations: string[] } | null = null
   session = await auth.api.getSession({ headers: await headers() })
   if (session) {
     profile = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { age: true, gradeLevel: true },
+      select: { age: true, gradeLevel: true, preferredLocations: true },
     })
   }
 
@@ -58,6 +63,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
 
   // Build Prisma query
   const whereClause: Prisma.ActivityWhereInput = {}
+  const andConditions: Prisma.ActivityWhereInput[] = []
 
   if (searchQuery) {
     whereClause.OR = [
@@ -83,9 +89,12 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   }
 
   if (statusFilter === "open") {
-    whereClause.isClosed = false
+    andConditions.push(
+      { isClosed: false },
+      { OR: [{ deadline: null }, { deadline: { gte: now } }] },
+    )
   } else if (statusFilter === "closed") {
-    whereClause.isClosed = true
+    andConditions.push({ OR: [{ isClosed: true }, { deadline: { lt: now } }] })
   }
 
   if (effectiveGradeFilter !== "ALL") {
@@ -100,12 +109,20 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   if (effectiveAgeFilter !== "ALL") {
     const ageNum = parseInt(effectiveAgeFilter, 10)
     if (!isNaN(ageNum)) {
-      whereClause.AND = [
+      andConditions.push(
         { OR: [{ minAge: null }, { minAge: { lte: ageNum } }] },
         { OR: [{ maxAge: null }, { maxAge: { gte: ageNum } }] },
-      ]
+      )
     }
   }
+
+  if (locationFilter !== "ALL") {
+    whereClause.locationTags = { has: locationFilter }
+  } else if (fitFilter && profile?.preferredLocations?.length) {
+    whereClause.locationTags = { hasSome: profile.preferredLocations }
+  }
+
+  if (andConditions.length > 0) whereClause.AND = andConditions
 
   let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = []
   try {
@@ -118,8 +135,6 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   }
 
   // Smart Sorting: prioritizing active upcoming deadlines
-  const now = new Date()
-
   activities.sort((a, b) => {
     if (sortOption === "newest") {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -168,6 +183,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     ageFilter !== "ALL" ||
     gradeFilter !== "ALL" ||
     fitFilter ||
+    locationFilter !== "ALL" ||
     prestigiousFilter !== "ALL" ||
     statusFilter !== "ALL" ||
     sortOption !== "deadline_asc"
@@ -210,7 +226,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
           <p className="text-base sm:text-lg text-[#2B0510]/75 max-w-2xl mx-auto font-medium">
             <T k="activities.description" />
           </p>
-          {session && (profile?.age != null || profile?.gradeLevel != null) && (
+          {session && (profile?.age != null || profile?.gradeLevel != null || (profile?.preferredLocations?.length ?? 0) > 0) && (
             <Link
               href="/activities?fit=me"
               className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFE5B4] hover:bg-[#FFD98A] text-[#7B1B38] rounded-full text-sm font-bold transition-colors"
@@ -218,7 +234,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
               <T k="activities.forMe" />
             </Link>
           )}
-          {fitFilter && session && profile?.age === null && profile?.gradeLevel === null && (
+          {fitFilter && session && profile?.age === null && profile?.gradeLevel === null && (profile?.preferredLocations?.length ?? 0) === 0 && (
             <p className="text-sm text-[#7B1B38] font-semibold">
               <T k="activities.completeProfile" />
             </p>
@@ -242,7 +258,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             </div>
 
             {/* Filter Dropdowns Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
               {/* Sort Option */}
               <div>
                 <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1 flex items-center gap-1">
@@ -328,6 +344,25 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                   <option value="ALL"><T k="activities.allAges" /></option>
                   {Array.from({ length: 8 }, (_, index) => index + 13).map((age) => (
                     <option key={age} value={age}>{age} <T k="activities.ageWord" /></option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
+                  <T k="activities.location" />
+                </label>
+                <select
+                  name="location"
+                  defaultValue={locationFilter}
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                >
+                  <option value="ALL"><T k="activities.allLocations" /></option>
+                  {LOCATION_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      <LocaleText tr={option.tr} en={option.en} />
+                    </option>
                   ))}
                 </select>
               </div>
@@ -421,17 +456,11 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 >
                   {/* Image & Badges Overlay */}
                   <div className="relative">
-                    {activity.imageUrl ? (
-                      <img
-                        src={activity.imageUrl}
-                        alt={activity.name}
-                        className="w-full h-40 sm:h-48 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-40 sm:h-48 bg-[#FFE5B4]/30 flex items-center justify-center">
-                        <Award className="w-12 h-12 text-[#7B1B38]" />
-                      </div>
-                    )}
+                    <ActivityImage
+                      src={activity.imageUrl}
+                      alt={activity.name}
+                      className="w-full h-40 sm:h-48 object-cover"
+                    />
 
                     {/* Top Badges */}
                     <div className="absolute top-3 left-3 right-3 flex justify-between items-center gap-2">
