@@ -415,16 +415,16 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
             {/* Subject / Field Filter */}
             <SubjectFilter selectedSubjects={subjectsFilter} />
             {/* Submit & Reset Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#F1E2D9]">
-              <div className="text-xs font-bold text-[#2B0510]/70 flex items-center gap-1.5">
-                <Filter className="w-4 h-4 text-[#7B1B38]" />
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#F1E2D9] dark:border-[#4a2030]">
+              <div className="text-xs font-bold text-[#2B0510]/70 dark:text-[#f5e8d0]/75 flex items-center gap-1.5">
+                <Filter className="w-4 h-4 text-[#7B1B38] dark:text-[#e8637f]" />
                 <T k="activities.count" values={{ count: activities.length }} />
               </div>
               <div className="flex items-center gap-2">
                 {hasActiveFilters && (
                   <Link
                     href="/activities"
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2B0510] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
+                    className="px-4 py-2 bg-gray-100 dark:bg-[#1a0a10] hover:bg-gray-200 dark:hover:bg-[#25101a] text-[#2B0510] dark:text-[#f5e8d0] border border-transparent dark:border-[#4a2030] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
                   >
                     <RefreshCw className="w-3.5 h-3.5" /> <T k="activities.clearFilters" />
                   </Link>
@@ -442,11 +442,11 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
 
         {/* Results List Grid */}
         {activities.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#F1E2D9] shadow-sm p-12 text-center space-y-4">
-            <p className="text-lg text-[#2B0510]/80 font-semibold">
+          <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] shadow-sm p-12 text-center space-y-4">
+            <p className="text-lg text-[#2B0510]/80 dark:text-[#f5e8d0] font-semibold">
               <T k="activities.noResults" />
             </p>
-            <p className="text-sm text-[#2B0510]/60 max-w-md mx-auto">
+            <p className="text-sm text-[#2B0510]/60 dark:text-[#f5e8d0]/70 max-w-md mx-auto">
               <T k="activities.noResultsDescription" />
             </p>
             <Link
@@ -465,7 +465,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                   key={activity.id}
                   href={`/activities/${activity.slug}`}
                   className={`bg-white dark:bg-[#2b1118] rounded-2xl border shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5 relative ${
-                    deadlineInfo.isExpired ? "opacity-75 border-gray-200" : "border-[#F1E2D9]"
+                    deadlineInfo.isExpired ? "opacity-75 border-gray-200 dark:border-gray-800" : "border-[#F1E2D9] dark:border-[#4a2030]"
                   }`}
                 >
                   {/* Image & Badges Overlay */}
@@ -496,11 +496,11 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                       </h3>
 
                       <div className="flex flex-wrap gap-1.5 pt-1">
-                        <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
+                        <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 dark:bg-[#4a2030] text-[#7B1B38] dark:text-[#f8d7df]">
                           {categoryLabels[activity.category] ? <LocaleText {...categoryLabels[activity.category]} /> : activity.category}
                         </span>
                         {activity.season && (
-                          <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 text-[#2B0510]/80">
+                          <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 dark:bg-[#3d1a24] text-[#2B0510]/80 dark:text-[#f5e8d0]/80">
                             {seasonLabels[activity.season] ? <LocaleText {...seasonLabels[activity.season]} /> : activity.season}
                           </span>
                         )}
@@ -511,23 +511,23 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                       </p>
                     </div>
 
-                    <div className="space-y-2 text-xs text-[#2B0510]/75 pt-4 border-t border-[#F1E2D9]">
+                    <div className="space-y-2 text-xs text-[#2B0510]/75 dark:text-[#f5e8d0]/80 pt-4 border-t border-[#F1E2D9] dark:border-[#4a2030]">
                       {activity.location && (
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 shrink-0 text-[#7B1B38]" />
-                          <span className="truncate">{activity.location}</span>
+                          <MapPin className="w-4 h-4 shrink-0 text-[#7B1B38] dark:text-[#e8637f]" />
+                          <span className="truncate text-[#7A696C] dark:text-[#f5e8d0] font-medium">{activity.location}</span>
                         </div>
                       )}
-                      <div className={`flex items-center gap-2 p-2 rounded-lg ${deadlineInfo.isExpired ? "bg-gray-100 text-gray-600" : "bg-[#FFF9F0] text-[#7B1B38]"}`}>
-                        <Clock className="w-4 h-4 shrink-0" />
+                      <div className={`flex items-center gap-2 p-2 rounded-lg ${deadlineInfo.isExpired ? "bg-gray-100 dark:bg-[#1a0a10] text-gray-600 dark:text-gray-300 border border-transparent dark:border-[#4a2030]" : "bg-[#FFF9F0] dark:bg-[#1a0a10] text-[#7B1B38] dark:text-[#f8d7df] border border-transparent dark:border-[#4a2030]"}`}>
+                        <Clock className="w-4 h-4 shrink-0 text-[#7B1B38] dark:text-[#e8637f]" />
                         <span className="font-bold">
                           <T k="activities.deadline" />: {activity.deadline ? <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} /> : <T k="activities.notSpecified" />}
                         </span>
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 mt-auto">
-                      <span className="text-[#7B1B38] font-bold text-sm">
+                    <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 dark:border-[#4a2030] mt-auto">
+                      <span className="text-[#7B1B38] dark:text-[#e8637f] font-bold text-sm">
                         <T k="activities.details" />
                       </span>
                     </div>

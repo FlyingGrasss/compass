@@ -180,7 +180,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
 
         {/* Directory Scholarships Count */}
         <div className="flex items-center justify-between border-b border-[#F1E2D9] dark:border-[#4a2030] pb-4">
-          <p className="text-sm font-bold text-[#7A696C]">
+          <p className="text-sm font-bold text-[#7A696C] dark:text-[#c4a08a]">
             <T k="scholarships.count" values={{ count: scholarships.length }} />
           </p>
           {(searchQuery || statusFilter !== "all" || eligibilityFilter !== "all" || prestigiousFilter !== "all") && (
@@ -195,12 +195,12 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
 
         {/* Scholarships Directory Grid */}
         {scholarships.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#F1E2D9] p-16 text-center space-y-4">
+          <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] p-16 text-center space-y-4">
             <div className="w-16 h-16 bg-[#FFE5B4]/30 rounded-full flex items-center justify-center mx-auto text-[#7B1B38]">
               <AlertCircle className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-[#2B0510]"><T k="scholarships.noResults" /></h3>
-            <p className="text-sm text-[#7A696C] max-w-md mx-auto">
+            <h3 className="text-xl font-bold text-[#2B0510] dark:text-[#f5e8d0]"><T k="scholarships.noResults" /></h3>
+            <p className="text-sm text-[#7A696C] dark:text-[#c4a08a] max-w-md mx-auto">
               <T k="scholarships.noResultsDescription" />
             </p>
           </div>
@@ -229,11 +229,11 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Status Badge */}
                     {scholarship.isClosed || Boolean(scholarship.deadline && new Date(scholarship.deadline) < now) ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-bold">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-transparent dark:border-red-900/40 text-xs font-bold">
                         <T k="scholarships.closedBadge" />
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-transparent dark:border-emerald-900/40 text-xs font-bold">
                         <CheckCircle2 className="w-3 h-3" /> <T k="scholarships.openBadge" />
                       </span>
                     )}
@@ -249,27 +249,27 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
 
                   {/* Scholarship Name */}
                   <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-[#2B0510] group-hover:text-[#7B1B38] transition-colors line-clamp-2">
+                    <h3 className="text-lg font-bold text-[#2B0510] dark:text-[#f5e8d0] group-hover:text-[#7B1B38] dark:group-hover:text-[#f8d7df] transition-colors line-clamp-2">
                       {scholarship.name}
                     </h3>
                     
                     {scholarship.location && (
-                      <div className="flex items-center gap-1.5 text-xs text-[#7A696C]">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">{scholarship.location}</span>
+                      <div className="flex items-center gap-1.5 text-xs text-[#7A696C] dark:text-[#c4a08a]">
+                        <MapPin className="w-3.5 h-3.5 shrink-0 text-[#7B1B38] dark:text-[#e8637f]" />
+                        <span className="truncate text-[#7A696C] dark:text-[#f5e8d0] font-medium">{scholarship.location}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm text-[#2B0510]/85 line-clamp-4 leading-relaxed font-medium">
+                  <p className="text-sm text-[#2B0510]/85 dark:text-[#f5e8d0]/80 line-clamp-4 leading-relaxed font-medium">
                     <LocalizedDescription text={scholarship.description} />
                   </p>
 
                   {/* Requirements Summary in card */}
                   {scholarship.requirements && (
-                    <div className="bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl p-3 text-xs text-[#2B0510]/95 font-medium space-y-1">
-                      <span className="font-bold text-[#7B1B38] text-[10px] uppercase tracking-wider block"><T k="scholarships.requirements" /></span>
+                    <div className="bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl p-3 text-xs text-[#2B0510]/95 dark:text-[#f5e8d0]/90 font-medium space-y-1">
+                      <span className="font-bold text-[#7B1B38] dark:text-[#f8d7df] text-[10px] uppercase tracking-wider block"><T k="scholarships.requirements" /></span>
                       <p className="line-clamp-2 leading-relaxed">
                         {scholarship.requirements.replace(/•\s/g, "")}
                       </p>
@@ -279,10 +279,10 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 </div>
 
                 {/* Footer Section */}
-                <div className="px-6 py-4 bg-[#FFFDF9] border-t border-[#F1E2D9]/60 flex items-center justify-between">
+                <div className="px-6 py-4 bg-[#FFFDF9] dark:bg-[#1a0a10] border-t border-[#F1E2D9]/60 dark:border-[#4a2030] flex items-center justify-between">
                   {/* Deadline */}
-                  <div className="flex items-center gap-1.5 text-xs text-[#7A696C] font-semibold">
-                    <Calendar className="w-4 h-4 text-[#7B1B38]" />
+                  <div className="flex items-center gap-1.5 text-xs text-[#7A696C] dark:text-[#c4a08a] font-semibold">
+                    <Calendar className="w-4 h-4 text-[#7B1B38] dark:text-[#f8d7df]" />
                     <span>
                       {scholarship.deadline ? (
                         <><T k="scholarships.deadline" />: <LocaleText tr={new Date(scholarship.deadline).toLocaleDateString("tr-TR")} en={new Date(scholarship.deadline).toLocaleDateString("en-US")} /></>
@@ -298,14 +298,14 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                       href={scholarship.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] hover:text-[#5A1127] transition-colors group/btn"
+                      className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] dark:text-[#f8d7df] hover:text-[#5A1127] dark:hover:text-[#e8637f] transition-colors group/btn"
                     >
                       <T k="scholarships.apply" /> <ArrowUpRight className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                     </a>
                   ) : (
                     <Link
                       href={`/activities/${scholarship.slug}`}
-                      className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] hover:text-[#5A1127] transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-black text-[#7B1B38] dark:text-[#f8d7df] hover:text-[#5A1127] dark:hover:text-[#e8637f] transition-colors"
                     >
                       <T k="scholarships.viewDetails" />
                     </Link>
