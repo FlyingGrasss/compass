@@ -1,4 +1,4 @@
-// app/scholarships/page.tsx
+﻿// app/scholarships/page.tsx
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
@@ -87,7 +87,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0] py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0] dark:from-[#1a0a10] dark:to-[#220d15] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-12">
         
         {/* Page Hero Section */}
@@ -109,7 +109,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
         </div>
 
         {/* Search and Interactive Filter Form */}
-        <div className="bg-white rounded-2xl border border-[#F1E2D9] p-6 shadow-md">
+        <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] p-6 shadow-md">
           <form method="GET" className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 items-center">
             
             {/* Search Input */}
@@ -121,7 +121,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 defaultValue={searchQuery}
                 trPlaceholder="Burs adı, gereksinimler veya anahtar kelimelerle ara..."
                 enPlaceholder="Search by scholarship name, requirements, or keywords..."
-                className="w-full pl-11 pr-4 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-[#2B0510] font-medium placeholder-[#7A696C]/60 focus:outline-none focus:ring-2 focus:ring-[#7B1B38] focus:border-[#7B1B38] transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-[#2B0510] dark:text-[#f5e8d0] font-medium placeholder-[#7A696C]/60 dark:placeholder-[#c4a08a]/60 focus:outline-none focus:ring-2 focus:ring-[#7B1B38] focus:border-[#7B1B38] transition-all"
               />
             </div>
 
@@ -133,7 +133,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 <select
                   name="eligibility"
                   defaultValue={eligibilityFilter}
-                  className="w-full sm:w-44 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
+                  className="w-full sm:w-44 px-3 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-sm font-semibold text-[#2B0510] dark:text-[#f5e8d0] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
                   <option value="all"><T k="scholarships.allEligibility" /></option>
                   <option value="global"><T k="scholarships.globalEligibility" /></option>
@@ -146,7 +146,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 <select
                   name="status"
                   defaultValue={statusFilter}
-                  className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
+                  className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-sm font-semibold text-[#2B0510] dark:text-[#f5e8d0] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
                   <option value="all"><T k="scholarships.allStatuses" /></option>
                   <option value="open"><T k="scholarships.openApplications" /></option>
@@ -159,7 +159,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                 <select
                   name="prestigious"
                   defaultValue={prestigiousFilter}
-                  className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-sm font-semibold text-[#2B0510] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
+                  className="w-full sm:w-40 px-3 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-sm font-semibold text-[#2B0510] dark:text-[#f5e8d0] focus:outline-none focus:ring-2 focus:ring-[#7B1B38] transition-all cursor-pointer appearance-none"
                 >
                   <option value="all"><T k="scholarships.allLevels" /></option>
                   <option value="true"><T k="scholarships.prestigiousOnly" /></option>
@@ -179,14 +179,14 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
         </div>
 
         {/* Directory Scholarships Count */}
-        <div className="flex items-center justify-between border-b border-[#F1E2D9] pb-4">
+        <div className="flex items-center justify-between border-b border-[#F1E2D9] dark:border-[#4a2030] pb-4">
           <p className="text-sm font-bold text-[#7A696C]">
             <T k="scholarships.count" values={{ count: scholarships.length }} />
           </p>
           {(searchQuery || statusFilter !== "all" || eligibilityFilter !== "all" || prestigiousFilter !== "all") && (
             <Link
               href="/scholarships"
-              className="text-xs font-bold text-[#7B1B38] hover:underline"
+              className="text-xs font-bold text-[#7B1B38] dark:text-[#f8d7df] hover:underline"
             >
               <T k="scholarships.clearFilters" />
             </Link>
@@ -209,7 +209,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
             {scholarships.map((scholarship) => (
               <div
                 key={scholarship.id}
-                className={`bg-white rounded-2xl border ${scholarship.isPrestigious ? "border-[#FFE5B4]" : "border-[#F1E2D9]"} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group hover:-translate-y-1.5`}
+                className={`bg-white dark:bg-[#2b1118] rounded-2xl border ${scholarship.isPrestigious ? "border-[#FFE5B4] dark:border-[#7B1B38]" : "border-[#F1E2D9] dark:border-[#4a2030]"} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group hover:-translate-y-1.5`}
               >
                 <ActivityImage
                   src={scholarship.imageUrl}
@@ -239,7 +239,7 @@ export default async function ScholarshipsPage({ searchParams }: PageProps) {
                     )}
 
                     {/* Support Amount badge */}
-                    <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-[#FFE5B4]/30 text-[#7B1B38] text-xs font-bold">
+                    <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-[#FFE5B4]/30 dark:bg-[#4a2030] text-[#7B1B38] dark:text-[#f8d7df] text-xs font-bold">
                       <DollarSign className="w-3 h-3" />{" "}
                       {scholarship.scholarshipAmount != null
                         ? scholarship.scholarshipAmount

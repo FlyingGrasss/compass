@@ -1,4 +1,4 @@
-// app/activities/[slug]/page.tsx
+﻿// app/activities/[slug]/page.tsx
 
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
@@ -60,16 +60,16 @@ export default async function ActivityDetailPage({
   )
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0]">
+    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] to-[#FFF9F0] dark:from-[#1a0a10] dark:to-[#220d15]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/activities"
-          className="inline-flex items-center text-[#7B1B38] font-bold hover:text-[#5A1127] mb-6 cursor-pointer"
+          className="inline-flex items-center text-[#7B1B38] dark:text-[#f8d7df] font-bold hover:text-[#5A1127] dark:hover:text-[#e8637f] mb-6 cursor-pointer"
         >
           <T k="detail.back" />
         </Link>
 
-        <div className="bg-white rounded-3xl border border-[#F1E2D9] shadow-xl overflow-hidden">
+        <div className="bg-white dark:bg-[#2b1118] rounded-3xl border border-[#F1E2D9] dark:border-[#4a2030] shadow-xl overflow-hidden">
           <ActivityImage
             src={activity.imageUrl}
             alt={activity.name}
@@ -98,51 +98,51 @@ export default async function ActivityDetailPage({
                   </span>
                 )}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-[#2B0510] tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-black text-[#2B0510] dark:text-[#f5e8d0] tracking-tight leading-tight">
                 {activity.name}
               </h1>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#FFFDF9] border border-[#F1E2D9]/70 rounded-2xl p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9]/70 dark:border-[#4a2030] rounded-2xl p-6">
               {activity.location && (
-                <div className="flex items-center gap-3 text-[#2B0510]">
-                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.location" /></p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.location" /></p>
                     <p className="font-bold text-sm">{activity.location}</p>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-[#2B0510]">
-                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+              <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.duration" /></p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.duration" /></p>
                   <p className="font-bold text-sm">{activity.duration}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-[#2B0510]">
-                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+              <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.season" /></p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.season" /></p>
                     <p className="font-bold text-sm"><LocaleText {...seasonLabels[activity.season as keyof typeof seasonLabels]} /></p>
                 </div>
               </div>
 
               {activity.deadline && (
-                <div className="flex items-center gap-3 text-[#2B0510]">
-                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.deadline" /></p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.deadline" /></p>
                     <p className="font-bold text-sm">
                       <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} />
                     </p>
@@ -150,12 +150,12 @@ export default async function ActivityDetailPage({
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-[#2B0510]">
-                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+              <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-[#7A696C]">
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]">
                     {activity.category === "SCHOLARSHIP"
                       ? <T k="detail.scholarshipAmount" />
                       : <T k="detail.financialSupport" />}
@@ -174,12 +174,12 @@ export default async function ActivityDetailPage({
               </div>
 
               {activity.entryPrice != null && (
-                <div className="flex items-center gap-3 text-[#2B0510]">
-                  <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+                <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                  <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                     <DollarSign className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]">
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]">
                       <T k="detail.entryFee" />
                     </p>
                     <p className="font-bold text-sm">
@@ -194,12 +194,12 @@ export default async function ActivityDetailPage({
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-[#2B0510]">
-                <div className="p-2.5 bg-[#FFE5B4]/40 rounded-xl text-[#7B1B38]">
+              <div className="flex items-center gap-3 text-[#2B0510] dark:text-[#f5e8d0]">
+                <div className="p-2.5 bg-[#FFE5B4]/40 dark:bg-[#4a2030] rounded-xl text-[#7B1B38] dark:text-[#f8d7df]">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C]"><T k="detail.targetGrades" /></p>
+                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.targetGrades" /></p>
                   <p className="font-bold text-sm">
                     {activity.gradeLevels.map((l) => `${l}.`).join(", ")} <T k="detail.grades" />
                   </p>
