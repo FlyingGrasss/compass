@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { ArrowLeft, Loader2, ShieldCheck, UserCog, Users } from "lucide-react"
 import { toast } from "sonner"
 import { useSession } from "@/lib/auth-client"
+import { formatGradeLevel } from "@/lib/grade-levels"
 
 type UserRole = "USER" | "ADMIN"
 
@@ -154,7 +155,7 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#2B0510]/75">
                         {user.school || "—"}
-                        {user.gradeLevel ? ` · ${user.gradeLevel}. sınıf` : ""}
+                        {user.gradeLevel !== null && user.gradeLevel !== undefined ? ` · ${formatGradeLevel(user.gradeLevel)}` : ""}
                         {user.age ? ` · ${user.age} yaş` : ""}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#2B0510]/75">

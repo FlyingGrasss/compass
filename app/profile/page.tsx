@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { User, Mail, GraduationCap, CalendarDays, Save, Compass } from "lucide-react"
 import { LocaleText, T, useLanguage } from "@/lib/i18n"
 import { LOCATION_OPTIONS } from "@/lib/activity-location"
+import { GRADE_LEVEL_OPTIONS } from "@/lib/grade-levels"
 
 type ProfileData = {
   age: number | null
@@ -18,7 +19,7 @@ type ProfileData = {
 
 export default function ProfilePage() {
   const { data: session, isPending } = useSession()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const router = useRouter()
   const [profile, setProfile] = useState<ProfileData>({ age: null, gradeLevel: null, preferredLocations: [] })
   const [ageInput, setAgeInput] = useState("")
@@ -199,8 +200,10 @@ export default function ProfilePage() {
                   className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] text-[#2B0510] disabled:opacity-60"
                 >
                   <option value=""><T k="profile.notSpecified" /></option>
-                  {Array.from({ length: 16 }, (_, index) => index + 1).map((level) => (
-                    <option key={level} value={level}>{level}. sınıf</option>
+                  {GRADE_LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {locale === "en" ? opt.en : opt.tr}
+                    </option>
                   ))}
                 </select>
               </label>

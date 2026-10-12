@@ -26,6 +26,11 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export const auth = betterAuth({
+  baseURL:
+    process.env.BETTER_AUTH_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://www.youthcompass.com.tr"
+      : undefined),
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

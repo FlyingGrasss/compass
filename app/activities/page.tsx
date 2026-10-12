@@ -1,4 +1,4 @@
-﻿// app/activities/page.tsx
+// app/activities/page.tsx
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
@@ -10,6 +10,7 @@ import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
 import { LOCATION_OPTIONS } from "@/lib/activity-location"
 import ActivityImage from "@/components/ActivityImage"
 import SubjectFilter from "@/components/SubjectFilter"
+import { GRADE_LEVEL_OPTIONS, parseGradeLevelFilter, normalizeGradeLevelValue } from "@/lib/grade-levels"
 
 export const metadata = {
   title: "Tüm Fırsatlar & Etkinlikler | YouthCompass",
@@ -59,7 +60,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   }
 
   const effectiveGradeFilter = fitFilter && profile?.gradeLevel != null
-    ? String(profile.gradeLevel)
+    ? normalizeGradeLevelValue(String(profile.gradeLevel))
     : gradeFilter
   const effectiveAgeFilter = fitFilter && profile?.age != null
     ? String(profile.age)
@@ -102,10 +103,10 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   }
 
   if (effectiveGradeFilter !== "ALL") {
-    const gradeNum = parseInt(effectiveGradeFilter, 10)
-    if (!isNaN(gradeNum)) {
+    const gradeValues = parseGradeLevelFilter(effectiveGradeFilter)
+    if (gradeValues && gradeValues.length > 0) {
       whereClause.gradeLevels = {
-        has: gradeNum,
+        hasSome: gradeValues,
       }
     }
   }
@@ -334,8 +335,10 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                   className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allGrades" /></option>
-                  {Array.from({ length: 16 }, (_, index) => index + 1).map((level) => (
-                    <option key={level} value={level}>{level}. <T k="activities.gradeWord" /></option>
+                  {GRADE_LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      <T k={`grades.${opt.key}`} />
+                    </option>
                   ))}
                 </select>
               </div>

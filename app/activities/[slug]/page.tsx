@@ -1,4 +1,4 @@
-﻿// app/activities/[slug]/page.tsx
+// app/activities/[slug]/page.tsx
 
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
@@ -16,6 +16,7 @@ import Link from "next/link"
 import { formatAmount } from "@/lib/format-amount"
 import { LocalizedDescription, LocaleText, T } from "@/lib/i18n"
 import ActivityImage from "@/components/ActivityImage"
+import { formatGradeLevels } from "@/lib/grade-levels"
 
 export default async function ActivityDetailPage({
   params,
@@ -201,7 +202,10 @@ export default async function ActivityDetailPage({
                 <div>
                     <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.targetGrades" /></p>
                   <p className="font-bold text-sm">
-                    {activity.gradeLevels.map((l) => `${l}.`).join(", ")} <T k="detail.grades" />
+                    <LocaleText
+                      tr={formatGradeLevels(activity.gradeLevels, "tr")}
+                      en={formatGradeLevels(activity.gradeLevels, "en")}
+                    />
                   </p>
                   {(activity.minAge !== null || activity.maxAge !== null) && (
                     <p className="font-bold text-sm mt-1">

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { toast } from "sonner"
 import { ActivityCategory, ActivitySeason, Activity } from "@prisma/client"
+import { GRADE_LEVEL_OPTIONS, sortGradeLevels } from "@/lib/grade-levels"
 
 export default function EditActivityPage() {
   const router = useRouter()
@@ -146,7 +147,7 @@ export default function EditActivityPage() {
       ...prev,
       gradeLevels: prev.gradeLevels.includes(level)
         ? prev.gradeLevels.filter((l) => l !== level)
-        : [...prev.gradeLevels, level].sort((a, b) => a - b),
+        : sortGradeLevels([...prev.gradeLevels, level]),
     }))
   }
 
@@ -277,18 +278,18 @@ export default function EditActivityPage() {
               Sınıf Seviyeleri *
             </label>
             <div className="flex flex-wrap gap-2">
-              {[9, 10, 11, 12].map((level) => (
+              {GRADE_LEVEL_OPTIONS.map((opt) => (
                 <button
-                  key={level}
+                  key={opt.value}
                   type="button"
-                  onClick={() => toggleGradeLevel(level)}
+                  onClick={() => toggleGradeLevel(opt.value)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
-                    formData.gradeLevels.includes(level)
+                    formData.gradeLevels.includes(opt.value)
                       ? "bg-[#7B1B38] text-white"
                       : "bg-[#F9EFE6] text-[#2B0510] hover:bg-[#FFE5B4]"
                   }`}
                 >
-                  {level}. Sınıf
+                  {opt.tr}
                 </button>
               ))}
             </div>

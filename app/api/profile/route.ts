@@ -3,12 +3,21 @@ import { headers } from "next/headers"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { LOCATION_TAGS, type LocationTag } from "@/lib/activity-location"
+import { VALID_GRADE_VALUES } from "@/lib/grade-levels"
 
 const parseOptionalInteger = (value: unknown, min: number, max: number) => {
   if (value === null || value === undefined || value === "") return null
 
   const parsed = Number(value)
   if (!Number.isInteger(parsed) || parsed < min || parsed > max) return undefined
+  return parsed
+}
+
+const parseGradeInput = (value: unknown): number | null | undefined => {
+  if (value === null || value === undefined || value === "") return null
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed)) return undefined
+  if (!VALID_GRADE_VALUES.includes(parsed)) return undefined
   return parsed
 }
 
@@ -55,12 +64,12 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json()
     const age = parseOptionalInteger(body?.age, 1, 100)
-    const gradeLevel = parseOptionalInteger(body?.gradeLevel, 1, 16)
+    const gradeLevel = parseGradeInput(body?.gradeLevel)
     const preferredLocations = parsePreferredLocations(body?.preferredLocations)
 
     if (age === undefined || gradeLevel === undefined) {
       return NextResponse.json(
-        { error: "Yaş 1-100, sınıf seviyesi 1-16 arasında olmalıdır." },
+        { error: "Yaş 1-100 arasında olmalıdır. Geçersiz sınıf seviyesi." },
         { status: 400 },
       )
     }

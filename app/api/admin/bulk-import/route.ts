@@ -6,6 +6,7 @@ import { headers } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { ActivityCategory, ActivitySeason } from "@prisma/client"
 import { parseAgeRange } from "@/lib/activity-eligibility"
+import { sortGradeLevels } from "@/lib/grade-levels"
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value)
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
       // Parse grade levels
       let gradeLevels: number[] = [9, 10, 11, 12]
       if (Array.isArray(act.gradeLevels)) {
-        gradeLevels = act.gradeLevels.map(Number).filter((n) => !Number.isNaN(n))
+        gradeLevels = sortGradeLevels(act.gradeLevels.map(Number).filter((n) => !Number.isNaN(n)))
       } else if (typeof act.gradeLevels === "number") {
         gradeLevels = [act.gradeLevels]
       } else if (typeof act.gradeLevels === "string") {
@@ -121,9 +122,10 @@ export async function POST(req: NextRequest) {
           if (!isNaN(start) && !isNaN(end)) {
             gradeLevels = []
             for (let i = start; i <= end; i++) gradeLevels.push(i)
+            gradeLevels = sortGradeLevels(gradeLevels)
           }
         } else {
-          gradeLevels = act.gradeLevels.split(",").map(Number).filter((n) => !Number.isNaN(n))
+          gradeLevels = sortGradeLevels(act.gradeLevels.split(",").map(Number).filter((n) => !Number.isNaN(n)))
         }
       }
 

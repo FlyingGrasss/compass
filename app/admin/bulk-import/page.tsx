@@ -114,7 +114,7 @@ financialSupport skalası:
     "title": "Etkinlik Adı",
     "description": "Türkçe açıklama...\n\n[English Summary]\nEnglish summary...",
     "category": "COMPETITION" | "SCHOLARSHIP" | "VOLUNTEER" | "SUMMER_PROGRAM" | "SCHOOL_PROGRAM" | "PLATFORM",
-    "gradeLevels": [9, 10, 11, 12],
+    "gradeLevels": [9, 10, 11, 12], // 8, 0 (Hazırlık), 9, 10, 11, 12, 14 (Lisans), 13 (Ön Lisans)
     "minAge": 13,
     "maxAge": 20,
     "financialSupport": "A+" | "A" | "B" | "C" | "D",
