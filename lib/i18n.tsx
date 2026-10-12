@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from "react"
 
@@ -136,6 +136,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "activities.today": "🔥 Bugüne Özel!",
     "activities.lastDays": "⚡ Son {days} Gün!",
     "activities.lastDaysPlain": "⏳ Son {days} Gün",
+    "activities.subjects": "Konu / Alan",
 
     "scholarships.title": "Burslar & Burs Rehberi",
     "scholarships.description": "Yurt dışında eğitim almak isteyen lise ve üniversite öğrencileri için en prestijli, güncel burs ve finansal destek fırsatları.",
@@ -353,6 +354,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "activities.today": "🔥 Today only!",
     "activities.lastDays": "⚡ {days} days left!",
     "activities.lastDaysPlain": "⏳ {days} days left",
+    "activities.subjects": "Subject / Field",
 
     "scholarships.title": "Scholarships & Scholarship Guide",
     "scholarships.description": "Current, prestigious scholarships and financial support opportunities for high-school and university students who want to study abroad.",

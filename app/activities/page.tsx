@@ -1,4 +1,4 @@
-// app/activities/page.tsx
+﻿// app/activities/page.tsx
 
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
@@ -9,6 +9,7 @@ import { ActivityCategory, ActivitySeason, Prisma } from "@prisma/client"
 import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
 import { LOCATION_OPTIONS } from "@/lib/activity-location"
 import ActivityImage from "@/components/ActivityImage"
+import SubjectFilter from "@/components/SubjectFilter"
 
 export const metadata = {
   title: "Tüm Fırsatlar & Etkinlikler | YouthCompass",
@@ -27,6 +28,7 @@ interface PageProps {
     prestigious?: string
     status?: string
     sort?: string
+    subjects?: string | string[]
   }>
 }
 
@@ -42,6 +44,8 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   const prestigiousFilter = resolvedSearchParams.prestigious || "ALL"
   const statusFilter = resolvedSearchParams.status || "ALL"
   const sortOption = resolvedSearchParams.sort || "deadline_asc"
+  const rawSubjects = resolvedSearchParams.subjects
+  const subjectsFilter: string[] = rawSubjects ? (Array.isArray(rawSubjects) ? rawSubjects : [rawSubjects]) : []
   const now = new Date()
 
   let session: Awaited<ReturnType<typeof auth.api.getSession>> = null
@@ -122,6 +126,10 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     whereClause.locationTags = { hasSome: profile.preferredLocations }
   }
 
+  if (subjectsFilter.length > 0) {
+    whereClause.subjectTags = { hasSome: subjectsFilter }
+  }
+
   if (andConditions.length > 0) whereClause.AND = andConditions
 
   let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = []
@@ -186,6 +194,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
     locationFilter !== "ALL" ||
     prestigiousFilter !== "ALL" ||
     statusFilter !== "ALL" ||
+    subjectsFilter.length > 0 ||
     sortOption !== "deadline_asc"
 
   const getDeadlineInfo = (deadlineStr?: string | Date | null, isClosed?: boolean) => {
@@ -213,17 +222,17 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] via-[#FFF9F0] to-[#FFFDF9] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] via-[#FFF9F0] to-[#FFFDF9] dark:from-[#1a0a10] dark:via-[#220d15] dark:to-[#1a0a10] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/50 border border-[#FFE5B4] text-[#7B1B38] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" /> <T k="activities.badge" />
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-[#7B1B38] tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-[#7B1B38] dark:text-[#f8d7df] tracking-tight">
             <T k="activities.title" />
           </h1>
-          <p className="text-base sm:text-lg text-[#2B0510]/75 max-w-2xl mx-auto font-medium">
+          <p className="text-base sm:text-lg text-[#2B0510]/75 dark:text-[#f5e8d0]/75 max-w-2xl mx-auto font-medium">
             <T k="activities.description" />
           </p>
           {session && (profile?.age != null || profile?.gradeLevel != null || (profile?.preferredLocations?.length ?? 0) > 0) && (
@@ -242,7 +251,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
         </div>
 
         {/* Filter Toolbar Component */}
-        <div className="bg-white rounded-2xl border border-[#F1E2D9] p-4 sm:p-6 shadow-md space-y-4">
+        <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] p-4 sm:p-6 shadow-md space-y-4">
           <form action="/activities" method="GET" className="space-y-4">
             {/* Search Input */}
             <div className="relative">
@@ -253,7 +262,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 defaultValue={searchQuery}
                 trPlaceholder="Başlık, açıklama, gereksinim veya konum ara..."
                 enPlaceholder="Search by title, description, requirement, or location..."
-                className="w-full pl-12 pr-4 py-3 bg-[#FFFDF9] border border-[#F1E2D9] rounded-xl text-[#2B0510] placeholder:text-[#7A696C]/60 font-medium outline-none focus:border-[#7B1B38] focus:ring-1 focus:ring-[#7B1B38] transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-[#2B0510] dark:text-[#f5e8d0] placeholder:text-[#7A696C]/60 font-medium outline-none focus:border-[#7B1B38] focus:ring-1 focus:ring-[#7B1B38] transition-all"
               />
             </div>
 
@@ -267,7 +276,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="sort"
                   defaultValue={sortOption}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#7B1B38]/30 rounded-xl text-xs sm:text-sm font-bold text-[#7B1B38] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#7B1B38]/30 dark:border-[#e8637f]/40 rounded-xl text-xs sm:text-sm font-bold text-[#7B1B38] dark:text-[#f8d7df] outline-none cursor-pointer"
                 >
                   <option value="deadline_asc"><T k="activities.sortUpcoming" /></option>
                   <option value="newest"><T k="activities.sortNewest" /></option>
@@ -283,7 +292,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="category"
                   defaultValue={categoryFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allCategories" /></option>
                   <option value="COMPETITION"><T k="activities.competition" /></option>
@@ -303,7 +312,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="season"
                   defaultValue={seasonFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allSeasons" /></option>
                   <option value="SUMMER"><T k="season.summer" /></option>
@@ -322,7 +331,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="grade"
                   defaultValue={effectiveGradeFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allGrades" /></option>
                   {Array.from({ length: 16 }, (_, index) => index + 1).map((level) => (
@@ -339,7 +348,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="age"
                   defaultValue={effectiveAgeFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allAges" /></option>
                   {Array.from({ length: 8 }, (_, index) => index + 13).map((age) => (
@@ -356,7 +365,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="location"
                   defaultValue={locationFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.allLocations" /></option>
                   {LOCATION_OPTIONS.map((option) => (
@@ -375,7 +384,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="prestigious"
                   defaultValue={prestigiousFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.all" /></option>
                   <option value="yes"><T k="activities.prestigiousOnly" /></option>
@@ -391,7 +400,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <select
                   name="status"
                   defaultValue={statusFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] border border-[#F1E2D9] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] outline-none cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
                 >
                   <option value="ALL"><T k="activities.all" /></option>
                   <option value="open"><T k="activities.open" /></option>
@@ -400,6 +409,8 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
               </div>
             </div>
 
+            {/* Subject / Field Filter */}
+            <SubjectFilter selectedSubjects={subjectsFilter} />
             {/* Submit & Reset Buttons */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#F1E2D9]">
               <div className="text-xs font-bold text-[#2B0510]/70 flex items-center gap-1.5">
@@ -450,7 +461,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                 <Link
                   key={activity.id}
                   href={`/activities/${activity.slug}`}
-                  className={`bg-white rounded-2xl border shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5 relative ${
+                  className={`bg-white dark:bg-[#2b1118] rounded-2xl border shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5 relative ${
                     deadlineInfo.isExpired ? "opacity-75 border-gray-200" : "border-[#F1E2D9]"
                   }`}
                 >
@@ -477,7 +488,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
 
                   <div className="p-6 space-y-4 flex-1 flex flex-col">
                     <div className="flex-1 space-y-2">
-                      <h3 className="text-lg font-bold text-[#2B0510] line-clamp-2">
+                      <h3 className="text-lg font-bold text-[#2B0510] dark:text-[#f5e8d0] line-clamp-2">
                         {activity.name}
                       </h3>
 
@@ -492,7 +503,7 @@ export default async function ActivitiesPage({ searchParams }: PageProps) {
                         )}
                       </div>
 
-                      <p className="text-sm text-[#2B0510]/85 line-clamp-3 leading-relaxed font-medium pt-1">
+                      <p className="text-sm text-[#2B0510]/85 dark:text-[#f5e8d0]/80 line-clamp-3 leading-relaxed font-medium pt-1">
                         <LocalizedDescription text={activity.description} />
                       </p>
                     </div>

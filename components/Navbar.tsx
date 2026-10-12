@@ -1,4 +1,4 @@
-// components/Navbar.tsx
+﻿// components/Navbar.tsx
 
 "use client"
 
@@ -6,16 +6,18 @@ import Link from "next/link"
 import Image from "next/image"
 import { useSession, signOut } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import { Compass, Menu, X } from "lucide-react"
+import { Compass, Menu, X, Moon, Sun } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { useLanguage } from "@/lib/i18n"
+import { useTheme } from "@/components/ThemeProvider"
 
 export default function Navbar() {
   const { data: session } = useSession()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const { locale, setLocale, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
 
   const handleSignOut = async () => {
     await signOut()
@@ -25,12 +27,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-[#FFE5B4]/40 shadow-xs sticky top-0 z-40">
+    <nav className="bg-white/95 dark:bg-[#1a0a10]/95 backdrop-blur-md border-b border-[#FFE5B4]/40 dark:border-[#4a2030] shadow-xs sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link
             href="/"
-            className="text-2xl flex gap-2.5 items-center font-black text-[#7B1B38] cursor-pointer tracking-tight"
+            className="text-2xl flex gap-2.5 items-center font-black text-[#7B1B38] dark:text-[#f8d7df] cursor-pointer tracking-tight"
           >
             <Image src="/logo.svg" alt="YouthCompass" width={36} height={36} className="h-9 w-9" />
             <span>YouthCompass</span>
@@ -40,14 +42,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             <Link
               href="/activities"
-              className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
+              className="text-sm font-bold text-[#2B0510]/80 dark:text-[#f5e8d0]/80 hover:text-[#7B1B38] dark:hover:text-[#f8d7df] transition-colors cursor-pointer"
             >
               {t("nav.activities")}
             </Link>
 
             <Link
               href="/scholarships"
-              className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
+              className="text-sm font-bold text-[#2B0510]/80 dark:text-[#f5e8d0]/80 hover:text-[#7B1B38] dark:hover:text-[#f8d7df] transition-colors cursor-pointer"
             >
               {t("nav.scholarships")}
             </Link>
@@ -64,12 +66,12 @@ export default function Navbar() {
 
             <Link
               href="/about"
-              className="text-sm font-bold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
+              className="text-sm font-bold text-[#2B0510]/80 dark:text-[#f5e8d0]/80 hover:text-[#7B1B38] dark:hover:text-[#f8d7df] transition-colors cursor-pointer"
             >
               {t("nav.about")}
             </Link>
 
-            <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] p-1" aria-label={t("language.label")}>
+            <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] dark:border-[#4a2030] p-1" aria-label={t("language.label")}>
               {(["tr", "en"] as const).map((option) => (
                 <button
                   key={option}
@@ -83,8 +85,18 @@ export default function Navbar() {
               ))}
             </div>
 
+            {/* Dark mode toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Açık moda geç" : "Koyu moda geç"}
+              className="p-2 rounded-xl border border-[#F1E2D9] text-[#7B1B38] hover:bg-[#FFE5B4]/40 transition-colors cursor-pointer dark:border-[#4a2030] dark:text-[#e8637f] dark:hover:bg-[#4a2030]/60"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
             {session ? (
-              <div className="flex items-center gap-4 border-l border-[#F1E2D9] pl-6">
+              <div className="flex items-center gap-4 border-l border-[#F1E2D9] dark:border-[#4a2030] pl-6">
                 <Link
                   href="/profile"
                   className="text-sm font-semibold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
@@ -109,7 +121,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-3 border-l border-[#F1E2D9] pl-6">
+              <div className="flex items-center gap-3 border-l border-[#F1E2D9] dark:border-[#4a2030] pl-6">
                 <Link
                   href="/auth/sign-in"
                   className="text-sm text-[#7B1B38] font-bold hover:text-[#5A1127] transition-colors cursor-pointer"
@@ -144,18 +156,28 @@ export default function Navbar() {
           <div className="md:hidden pb-4 space-y-2 border-t border-[#F1E2D9] mt-2 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="flex items-center justify-between px-4 pt-3">
               <span className="text-xs font-bold text-[#7B1B38]">{t("language.label")}</span>
-              <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] p-1">
-                {(["tr", "en"] as const).map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setLocale(option)}
-                    aria-pressed={locale === option}
-                    className={`px-2 py-1 text-[11px] font-black rounded-lg transition-colors cursor-pointer ${locale === option ? "bg-[#7B1B38] text-white" : "text-[#7B1B38] hover:bg-[#FFE5B4]/40"}`}
-                  >
-                    {option.toUpperCase()}
-                  </button>
-                ))}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 rounded-xl border border-[#F1E2D9] dark:border-[#4a2030] p-1">
+                  {(["tr", "en"] as const).map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setLocale(option)}
+                      aria-pressed={locale === option}
+                      className={`px-2 py-1 text-[11px] font-black rounded-lg transition-colors cursor-pointer ${locale === option ? "bg-[#7B1B38] text-white" : "text-[#7B1B38] hover:bg-[#FFE5B4]/40"}`}
+                    >
+                      {option.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label={theme === "dark" ? "Açık moda geç" : "Koyu moda geç"}
+                  className="p-1.5 rounded-xl border border-[#F1E2D9] text-[#7B1B38] hover:bg-[#FFE5B4]/40 transition-colors cursor-pointer dark:border-[#4a2030] dark:text-[#e8637f]"
+                >
+                  {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                </button>
               </div>
             </div>
             <Link

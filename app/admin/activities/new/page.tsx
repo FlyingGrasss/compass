@@ -30,6 +30,7 @@ export default function NewActivityPage() {
     requirements: "",
     website: "",
     imageUrl: "",
+    subjectTags: [] as string[],
   })
 
   const generateSlug = (name: string) => {
@@ -88,6 +89,30 @@ export default function NewActivityPage() {
       gradeLevels: prev.gradeLevels.includes(level)
         ? prev.gradeLevels.filter((l) => l !== level)
         : [...prev.gradeLevels, level].sort((a, b) => a - b),
+    }))
+  }
+
+  const SUBJECT_OPTIONS_ADMIN = [
+    { value: "biology", label: "Biyoloji" },
+    { value: "chemistry", label: "Kimya" },
+    { value: "physics", label: "Fizik" },
+    { value: "math", label: "Matematik" },
+    { value: "cs", label: "Bilgisayar Bilimi" },
+    { value: "engineering", label: "Mühendislik" },
+    { value: "medicine", label: "Sağlık / Tıp" },
+    { value: "social", label: "Sosyal Bilimler" },
+    { value: "business", label: "İşletme & Ekonomi" },
+    { value: "humanities", label: "Beşeri Bilimler & Sanat" },
+    { value: "environment", label: "Çevre Bilimleri" },
+    { value: "law", label: "Hukuk & Kamu Politikası" },
+  ]
+
+  const toggleSubjectTag = (tag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      subjectTags: prev.subjectTags.includes(tag)
+        ? prev.subjectTags.filter((t) => t !== tag)
+        : [...prev.subjectTags, tag],
     }))
   }
 
@@ -431,6 +456,27 @@ export default function NewActivityPage() {
               placeholder="https://example.com/image.jpg"
               className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510]"
             />
+          </div>
+        </div>
+
+        {/* Subject Tags */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <label className="block text-sm font-medium text-[#2B0510] mb-3">Konu / Alan Etiketleri (opsiyonel)</label>
+          <div className="flex flex-wrap gap-2">
+            {SUBJECT_OPTIONS_ADMIN.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => toggleSubjectTag(opt.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
+                  formData.subjectTags.includes(opt.value)
+                    ? "bg-[#7B1B38] text-white"
+                    : "bg-[#F9EFE6] text-[#2B0510] hover:bg-[#FFE5B4]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
 

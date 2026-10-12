@@ -93,6 +93,7 @@ model Activity {
   deadline        DateTime?
   location        String?
   locationTags    String[]          @default([])
+  subjectTags     String[]          @default([])
   requirements    String?          @db.Text
   website         String?
   imageUrl        String?

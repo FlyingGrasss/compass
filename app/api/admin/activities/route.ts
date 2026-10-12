@@ -1,4 +1,4 @@
-// app/api/admin/activities/route.ts
+﻿// app/api/admin/activities/route.ts
 
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         deadline: data.deadline ? new Date(data.deadline) : null,
         location: normalizeLocation(data.location),
         locationTags: getLocationTags(data.location),
+        subjectTags: data.subjectTags || [],
         requirements: data.requirements || null,
         website: data.website || null,
         imageUrl: data.imageUrl || null,
