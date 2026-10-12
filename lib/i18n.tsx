@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from "react"
 
@@ -193,6 +193,9 @@ const messages: Record<Locale, Record<string, string>> = {
     "auth.signedIn": "Başarıyla giriş yapıldı!",
     "auth.invalidCredentials": "E-posta veya şifre hatalı",
     "auth.signInError": "Giriş yapılamadı. Lütfen tekrar deneyin.",
+    "auth.continueWithGoogle": "Google ile Devam Et",
+    "auth.googleSignInError": "Google ile giriş yapılamadı. Lütfen tekrar deneyin.",
+    "auth.or": "veya",
     "auth.noAccount": "Hesabınız yok mu?",
     "auth.register": "Kayıt Ol",
     "auth.signUp": "Kayıt Ol",
@@ -411,6 +414,9 @@ const messages: Record<Locale, Record<string, string>> = {
     "auth.signedIn": "Successfully signed in!",
     "auth.invalidCredentials": "Incorrect email or password",
     "auth.signInError": "Unable to sign in. Please try again.",
+    "auth.continueWithGoogle": "Continue with Google",
+    "auth.googleSignInError": "Unable to sign in with Google. Please try again.",
+    "auth.or": "or",
     "auth.noAccount": "Don't have an account?",
     "auth.register": "Register",
     "auth.signUp": "Sign up",
