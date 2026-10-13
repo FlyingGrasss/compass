@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     try {
       const displayName = existingUser.name || "Kullanıcı"
       const { error: emailError } = await resend.emails.send({
-        from: "snowday@balogrenci.org",
+        from: "YouthCompass <noreply@youthcompass.com.tr>",
         to: normalizedEmail,
         subject: "YouthCompass - Şifre Sıfırlama Kodu",
         html: `

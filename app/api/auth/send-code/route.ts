@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
 
     try {
       const { error: emailError } = await resend.emails.send({
-        from: "snowday@balogrenci.org",
+        from: "YouthCompass <noreply@youthcompass.com.tr>",
         to: email,
-        subject: "E-posta Doğrulama Kodu",
+        subject: "YouthCompass - E-posta Doğrulama Kodu",
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #7B1B38;">Hoş geldiniz, ${escapeHtml(name)}!</h2>

@@ -1,4 +1,4 @@
-// app/auth/sign-up/page.tsx
+﻿// app/auth/sign-up/page.tsx
 
 "use client"
 
@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { signIn, signUp, useSession } from "@/lib/auth-client"
 import { toast } from "sonner"
-import { Mail, X } from "lucide-react"
+import { Mail, X, Eye, EyeOff } from "lucide-react"
 import { T, useLanguage } from "@/lib/i18n"
 import GoogleIcon from "@/components/GoogleIcon"
 
@@ -25,6 +25,8 @@ export default function SignUpPage() {
   const [isVerifying, setIsVerifying] = useState(false)
   const { t } = useLanguage()
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true)
@@ -245,16 +247,26 @@ export default function SignUpPage() {
               >
                 <T k="auth.password" />
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
-                placeholder={t("auth.passwordPlaceholder")}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40 pr-12"
+                  placeholder={t("auth.passwordPlaceholder")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2B0510]/50 hover:text-[#2B0510] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div>
@@ -264,16 +276,26 @@ export default function SignUpPage() {
               >
                 <T k="auth.confirmPassword" />
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
-                placeholder={t("auth.confirmPasswordPlaceholder")}
-              />
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40 pr-12"
+                  placeholder={t("auth.confirmPasswordPlaceholder")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2B0510]/50 hover:text-[#2B0510] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <button

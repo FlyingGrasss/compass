@@ -6,7 +6,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { ArrowLeft, KeyRound, Mail, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, KeyRound, Mail, Eye, EyeOff } from "lucide-react"
+import { signIn } from "@/lib/auth-client"
 import { T, useLanguage } from "@/lib/i18n"
 
 export default function ForgotPasswordPage() {
@@ -18,6 +19,8 @@ export default function ForgotPasswordPage() {
   const [code, setCode] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmNewPassword, setConfirmNewPassword] = useState("")
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -94,13 +97,25 @@ export default function ForgotPasswordPage() {
         throw new Error(data.error || "Şifre sıfırlanamadı")
       }
 
+      // Auto sign-in with the new password
       toast.success(t("auth.resetSuccess"))
-      router.push("/auth/sign-in")
+
+      await signIn.email(
+        { email, password: newPassword },
+        {
+          onSuccess: () => {
+            router.push("/profile")
+          },
+          onError: () => {
+            // If auto-login fails for some reason, redirect to sign in
+            router.push("/auth/sign-in")
+          },
+        }
+      )
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Şifre sıfırlanamadı"
       setErrorMessage(msg)
       toast.error(msg)
-    } finally {
       setIsLoading(false)
     }
   }
@@ -191,30 +206,50 @@ export default function ForgotPasswordPage() {
                 <label htmlFor="newPassword" className="block text-sm font-medium text-[#2B0510] mb-1.5">
                   <T k="auth.newPassword" />
                 </label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
-                  placeholder={t("auth.newPasswordPlaceholder")}
-                />
+                <div className="relative">
+                  <input
+                    id="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 pr-11 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
+                    placeholder={t("auth.newPasswordPlaceholder")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2B0510]/40 hover:text-[#7B1B38] transition-colors cursor-pointer"
+                    aria-label={showNewPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  >
+                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-[#2B0510] mb-1.5">
                   <T k="auth.confirmNewPassword" />
                 </label>
-                <input
-                  id="confirmNewPassword"
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
-                  placeholder={t("auth.confirmNewPasswordPlaceholder")}
-                />
+                <div className="relative">
+                  <input
+                    id="confirmNewPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 pr-11 bg-[#F9EFE6] border-2 border-transparent rounded-lg focus:outline-none focus:border-[#7B1B38] transition-colors text-[#2B0510] placeholder:text-[#2B0510]/40"
+                    placeholder={t("auth.confirmNewPasswordPlaceholder")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2B0510]/40 hover:text-[#7B1B38] transition-colors cursor-pointer"
+                    aria-label={showConfirmPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
 
               <button
