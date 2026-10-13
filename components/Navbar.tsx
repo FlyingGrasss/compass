@@ -21,18 +21,14 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      await signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            toast.success("Çıkış yapıldı")
-            setIsOpen(false)
-            window.location.href = "/"
-          },
-        },
-      })
-    } catch {
-      toast.success("Çıkış yapıldı")
       setIsOpen(false)
+      toast.success("Çıkış yapıldı")
+      // Call Better Auth sign out
+      await signOut()
+    } catch {
+      // Ignore errors
+    } finally {
+      // Force clean navigation to home
       window.location.href = "/"
     }
   }

@@ -34,10 +34,15 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  trustedOrigins: [
+    "https://youthcompass.com.tr",
+    "https://www.youthcompass.com.tr",
+  ],
   account: {
     accountLinking: {
       enabled: true,
       trustedProviders: ["google"],
+      requireLocalEmailVerified: false,
     },
   },
   socialProviders: {

@@ -53,6 +53,12 @@ export default function SignInPage() {
 
     window.addEventListener("pageshow", handlePageShow)
 
+    const params = new URLSearchParams(window.location.search)
+    const err = params.get("error")
+    if (err === "account_not_linked") {
+      setSignInError("auth.accountNotLinked")
+    }
+
     if (!isPending && session) {
       router.push("/profile")
     }
@@ -167,9 +173,17 @@ export default function SignInPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#2B0510] mb-1.5">
-                <T k="auth.password" />
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-[#2B0510]">
+                  <T k="auth.password" />
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs font-semibold text-[#7B1B38] hover:text-[#5A1127] hover:underline transition-colors"
+                >
+                  <T k="auth.forgotPassword" />
+                </Link>
+              </div>
               <input
                 id="password"
                 type="password"

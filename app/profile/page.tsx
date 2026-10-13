@@ -100,16 +100,11 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     try {
-      await signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            toast.success("Çıkış yapıldı")
-            window.location.href = "/"
-          },
-        },
-      })
-    } catch {
       toast.success("Çıkış yapıldı")
+      await signOut()
+    } catch {
+      // Ignore errors
+    } finally {
       window.location.href = "/"
     }
   }
