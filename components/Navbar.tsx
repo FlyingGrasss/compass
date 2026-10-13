@@ -1,4 +1,4 @@
-﻿// components/Navbar.tsx
+// components/Navbar.tsx
 
 "use client"
 
@@ -99,7 +99,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4 border-l border-[#F1E2D9] dark:border-[#4a2030] pl-6">
                 <Link
                   href="/profile"
-                  className="text-sm font-semibold text-[#2B0510]/80 hover:text-[#7B1B38] transition-colors cursor-pointer"
+                  className="text-sm font-semibold text-[#2B0510]/80 dark:text-[#f5e8d0]/80 hover:text-[#7B1B38] dark:hover:text-[#f8d7df] transition-colors cursor-pointer"
                 >
                   {session.user?.name || t("nav.profile")}
                 </Link>
@@ -219,7 +219,7 @@ export default function Navbar() {
               <div className="pt-2 border-t border-[#F1E2D9] space-y-2">
                 <Link
                   href="/profile"
-                  className="block px-4 py-2.5 text-sm font-semibold text-[#2B0510]/80 hover:text-[#7B1B38] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
+                  className="block px-4 py-2.5 text-sm font-semibold text-[#2B0510]/80 dark:text-[#f5e8d0]/80 hover:text-[#7B1B38] dark:hover:text-[#f8d7df] hover:bg-[#FFE5B4]/20 rounded-xl transition-colors cursor-pointer"
                   onClick={() => setIsOpen(false)}
                 >
                   {session.user?.name || t("nav.profile")}

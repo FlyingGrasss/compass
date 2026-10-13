@@ -1,4 +1,4 @@
-﻿// app/about/page.tsx
+// app/about/page.tsx
 
 import Link from "next/link"
 import Image from "next/image"
@@ -58,9 +58,9 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60"><T k="about.shapeFuture" /></span>
-              <Heart className="w-5 h-5 text-[#7B1B38] fill-[#7B1B38]/10" />
+            <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 dark:border-[#4a2030] flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60 dark:text-[#f5e8d0]/60"><T k="about.shapeFuture" /></span>
+              <Heart className="w-5 h-5 text-[#7B1B38] dark:text-[#e8637f] fill-[#7B1B38]/10 dark:fill-[#e8637f]/10" />
             </div>
           </div>
 
@@ -90,9 +90,9 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60"><T k="about.crossBorders" /></span>
-              <BookOpen className="w-5 h-5 text-[#7B1B38]" />
+            <div className="mt-8 pt-6 border-t border-[#F1E2D9]/60 dark:border-[#4a2030] flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#7B1B38]/60 dark:text-[#f5e8d0]/60"><T k="about.crossBorders" /></span>
+              <BookOpen className="w-5 h-5 text-[#7B1B38] dark:text-[#e8637f]" />
             </div>
           </div>
 
