@@ -40,6 +40,7 @@ async function main() {
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,
+        subjectTags: entry.subjectTags || [],
       },
       create: {
         name: entry.name,
@@ -62,6 +63,7 @@ async function main() {
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,
+        subjectTags: entry.subjectTags || [],
       },
     })
   }

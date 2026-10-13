@@ -99,9 +99,19 @@ export default function ProfilePage() {
   }
 
   const handleSignOut = async () => {
-    await signOut()
-    toast.success("Çıkış yapıldı")
-    router.push("/")
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Çıkış yapıldı")
+            window.location.href = "/"
+          },
+        },
+      })
+    } catch {
+      toast.success("Çıkış yapıldı")
+      window.location.href = "/"
+    }
   }
 
   if (isPending) {

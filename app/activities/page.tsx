@@ -1,542 +1,61 @@
 // app/activities/page.tsx
 
-import Link from "next/link"
+import { Suspense } from "react"
 import { prisma } from "@/lib/prisma"
-import { auth } from "@/auth"
-import { headers } from "next/headers"
-import { MapPin, Search, Filter, RefreshCw, Sparkles, Clock, ArrowUpDown } from "lucide-react"
-import { ActivityCategory, ActivitySeason, Prisma } from "@prisma/client"
-import { LocalizedDescription, LocalizedInput, LocaleText, T } from "@/lib/i18n"
-import { LOCATION_OPTIONS } from "@/lib/activity-location"
-import ActivityImage from "@/components/ActivityImage"
-import SubjectFilter from "@/components/SubjectFilter"
-import { GRADE_LEVEL_OPTIONS, parseGradeLevelFilter, normalizeGradeLevelValue } from "@/lib/grade-levels"
+import ActivitiesClient, { SerializedActivity } from "@/components/ActivitiesClient"
+import { KNOWN_ACTIVITY_SUBJECTS } from "@/lib/activity-subjects"
+
+export const revalidate = 300
 
 export const metadata = {
   title: "Tüm Fırsatlar & Etkinlikler | YouthCompass",
   description: "Liseli ve üniversiteli gençler için yarışmalar, yaz programları, staj ve gönüllülük fırsatları.",
 }
 
-interface PageProps {
-  searchParams: Promise<{
-    search?: string
-    category?: string
-    season?: string
-    grade?: string
-    age?: string
-    location?: string
-    fit?: string
-    prestigious?: string
-    status?: string
-    sort?: string
-    subjects?: string | string[]
-  }>
-}
+export default async function ActivitiesPage() {
+  let activities: SerializedActivity[] = []
 
-export default async function ActivitiesPage({ searchParams }: PageProps) {
-  const resolvedSearchParams = await searchParams
-  const searchQuery = resolvedSearchParams.search || ""
-  const categoryFilter = resolvedSearchParams.category || "ALL"
-  const seasonFilter = resolvedSearchParams.season || "ALL"
-  const gradeFilter = resolvedSearchParams.grade || "ALL"
-  const ageFilter = resolvedSearchParams.age || "ALL"
-  const locationFilter = resolvedSearchParams.location || "ALL"
-  const fitFilter = resolvedSearchParams.fit === "me"
-  const prestigiousFilter = resolvedSearchParams.prestigious || "ALL"
-  const statusFilter = resolvedSearchParams.status || "ALL"
-  const sortOption = resolvedSearchParams.sort || "deadline_asc"
-  const rawSubjects = resolvedSearchParams.subjects
-  const subjectsFilter: string[] = rawSubjects ? (Array.isArray(rawSubjects) ? rawSubjects : [rawSubjects]) : []
-  const now = new Date()
-
-  let session: Awaited<ReturnType<typeof auth.api.getSession>> = null
-  let profile: { age: number | null; gradeLevel: number | null; preferredLocations: string[] } | null = null
-  session = await auth.api.getSession({ headers: await headers() })
-  if (session) {
-    profile = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { age: true, gradeLevel: true, preferredLocations: true },
-    })
-  }
-
-  const effectiveGradeFilter = fitFilter && profile?.gradeLevel != null
-    ? normalizeGradeLevelValue(String(profile.gradeLevel))
-    : gradeFilter
-  const effectiveAgeFilter = fitFilter && profile?.age != null
-    ? String(profile.age)
-    : ageFilter
-
-  // Build Prisma query
-  const whereClause: Prisma.ActivityWhereInput = {}
-  const andConditions: Prisma.ActivityWhereInput[] = []
-
-  if (searchQuery) {
-    whereClause.OR = [
-      { name: { contains: searchQuery, mode: "insensitive" } },
-      { description: { contains: searchQuery, mode: "insensitive" } },
-      { requirements: { contains: searchQuery, mode: "insensitive" } },
-      { location: { contains: searchQuery, mode: "insensitive" } },
-    ]
-  }
-
-  if (categoryFilter !== "ALL") {
-    whereClause.category = categoryFilter as ActivityCategory
-  }
-
-  if (seasonFilter !== "ALL") {
-    whereClause.season = seasonFilter as ActivitySeason
-  }
-
-  if (prestigiousFilter === "yes") {
-    whereClause.isPrestigious = true
-  } else if (prestigiousFilter === "no") {
-    whereClause.isPrestigious = false
-  }
-
-  if (statusFilter === "open") {
-    andConditions.push(
-      { isClosed: false },
-      { OR: [{ deadline: null }, { deadline: { gte: now } }] },
-    )
-  } else if (statusFilter === "closed") {
-    andConditions.push({ OR: [{ isClosed: true }, { deadline: { lt: now } }] })
-  }
-
-  if (effectiveGradeFilter !== "ALL") {
-    const gradeValues = parseGradeLevelFilter(effectiveGradeFilter)
-    if (gradeValues && gradeValues.length > 0) {
-      whereClause.gradeLevels = {
-        hasSome: gradeValues,
-      }
-    }
-  }
-
-  if (effectiveAgeFilter !== "ALL") {
-    const ageNum = parseInt(effectiveAgeFilter, 10)
-    if (!isNaN(ageNum)) {
-      andConditions.push(
-        { OR: [{ minAge: null }, { minAge: { lte: ageNum } }] },
-        { OR: [{ maxAge: null }, { maxAge: { gte: ageNum } }] },
-      )
-    }
-  }
-
-  if (locationFilter !== "ALL") {
-    whereClause.locationTags = { has: locationFilter }
-  } else if (fitFilter && profile?.preferredLocations?.length) {
-    whereClause.locationTags = { hasSome: profile.preferredLocations }
-  }
-
-  if (subjectsFilter.length > 0) {
-    whereClause.subjectTags = { hasSome: subjectsFilter }
-  }
-
-  if (andConditions.length > 0) whereClause.AND = andConditions
-
-  let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = []
   try {
-    activities = await prisma.activity.findMany({
-      where: whereClause,
+    const rawActivities = await prisma.activity.findMany({
       orderBy: { createdAt: "desc" },
     })
+
+    activities = rawActivities.map((act) => ({
+      id: act.id,
+      name: act.name,
+      slug: act.slug,
+      description: act.description,
+      category: act.category,
+      gradeLevels: act.gradeLevels,
+      minAge: act.minAge,
+      maxAge: act.maxAge,
+      financialSupport: act.financialSupport,
+      entryPrice: act.entryPrice ? Number(act.entryPrice) : null,
+      scholarshipAmount: act.scholarshipAmount,
+      amountCurrency: act.amountCurrency,
+      isPrestigious: act.isPrestigious,
+      isClosed: act.isClosed,
+      season: act.season,
+      duration: act.duration,
+      deadline: act.deadline ? act.deadline.toISOString() : null,
+      location: act.location,
+      locationTags: act.locationTags,
+      subjectTags: act.subjectTags?.length ? act.subjectTags : (KNOWN_ACTIVITY_SUBJECTS[act.slug] || []),
+      requirements: act.requirements,
+      website: act.website,
+      imageUrl: act.imageUrl,
+      createdAt: act.createdAt.toISOString(),
+    }))
   } catch (error) {
-    console.error("Database fetch error in ActivitiesPage:", error)
-  }
-
-  // Smart Sorting: prioritizing active upcoming deadlines
-  activities.sort((a, b) => {
-    if (sortOption === "newest") {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    }
-
-    const aClosed = a.isClosed || (a.deadline && new Date(a.deadline) < now)
-    const bClosed = b.isClosed || (b.deadline && new Date(b.deadline) < now)
-
-    if (aClosed !== bClosed) {
-      return aClosed ? 1 : -1 // Active/open ones first
-    }
-
-    if (a.deadline && b.deadline) {
-      const timeA = new Date(a.deadline).getTime()
-      const timeB = new Date(b.deadline).getTime()
-      return sortOption === "deadline_desc" ? timeB - timeA : timeA - timeB
-    }
-
-    if (a.deadline) return -1
-    if (b.deadline) return 1
-
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  })
-
-  const categoryLabels: Record<string, { tr: string; en: string }> = {
-    COMPETITION: { tr: "Yarışma", en: "Competition" },
-    VOLUNTEER: { tr: "Gönüllülük", en: "Volunteering" },
-    SUMMER_PROGRAM: { tr: "Yaz Programı", en: "Summer Program" },
-    SCHOOL_PROGRAM: { tr: "Okul Programı", en: "School Program" },
-    SCHOLARSHIP: { tr: "Burs", en: "Scholarship" },
-    PLATFORM: { tr: "Platform", en: "Platform" },
-  }
-
-  const seasonLabels: Record<string, { tr: string; en: string }> = {
-    SUMMER: { tr: "Yaz", en: "Summer" },
-    WINTER: { tr: "Kış", en: "Winter" },
-    FALL: { tr: "Sonbahar", en: "Fall" },
-    SPRING: { tr: "İlkbahar", en: "Spring" },
-    YEAR_ROUND: { tr: "Yıl Boyu", en: "Year-round" },
-  }
-
-  const hasActiveFilters =
-    searchQuery !== "" ||
-    categoryFilter !== "ALL" ||
-    seasonFilter !== "ALL" ||
-    ageFilter !== "ALL" ||
-    gradeFilter !== "ALL" ||
-    fitFilter ||
-    locationFilter !== "ALL" ||
-    prestigiousFilter !== "ALL" ||
-    statusFilter !== "ALL" ||
-    subjectsFilter.length > 0 ||
-    sortOption !== "deadline_asc"
-
-  const getDeadlineInfo = (deadlineStr?: string | Date | null, isClosed?: boolean) => {
-    if (isClosed) {
-      return { tr: "Başvurular Kapandı", en: "Applications closed", color: "bg-gray-200 text-gray-700", isExpired: true }
-    }
-    if (!deadlineStr) {
-      return { tr: "Sürekli / Açık", en: "Ongoing / Open", color: "bg-emerald-100 text-emerald-800", isExpired: false }
-    }
-    const deadline = new Date(deadlineStr)
-    const diffTime = deadline.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays < 0) {
-      return { tr: "Süresi Doldu", en: "Expired", color: "bg-gray-200 text-gray-700", isExpired: true }
-    } else if (diffDays === 0) {
-      return { tr: "🔥 Bugüne Özel!", en: "🔥 Today only!", color: "bg-red-600 text-white animate-pulse font-extrabold", isExpired: false }
-    } else if (diffDays <= 7) {
-      return { tr: `⚡ Son ${diffDays} Gün!`, en: `⚡ ${diffDays} days left!`, color: "bg-rose-500 text-white font-black animate-pulse", isExpired: false }
-    } else if (diffDays <= 30) {
-      return { tr: `⏳ Son ${diffDays} Gün`, en: `⏳ ${diffDays} days left`, color: "bg-amber-500 text-white font-bold", isExpired: false }
-    } else {
-      return { tr: `📅 ${deadline.toLocaleDateString("tr-TR")}`, en: `📅 ${deadline.toLocaleDateString("en-US")}`, color: "bg-sky-100 text-sky-900 font-bold", isExpired: false }
-    }
+    console.error("Failed to fetch activities for SSG:", error)
   }
 
   return (
     <main className="min-h-screen bg-linear-to-b from-[#FFFDF9] via-[#FFF9F0] to-[#FFFDF9] dark:from-[#1a0a10] dark:via-[#220d15] dark:to-[#1a0a10] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/50 border border-[#FFE5B4] text-[#7B1B38] text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> <T k="activities.badge" />
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-[#7B1B38] dark:text-[#f8d7df] tracking-tight">
-            <T k="activities.title" />
-          </h1>
-          <p className="text-base sm:text-lg text-[#2B0510]/75 dark:text-[#f5e8d0]/75 max-w-2xl mx-auto font-medium">
-            <T k="activities.description" />
-          </p>
-          {session && (profile?.age != null || profile?.gradeLevel != null || (profile?.preferredLocations?.length ?? 0) > 0) && (
-            <Link
-              href="/activities?fit=me"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFE5B4] hover:bg-[#FFD98A] text-[#7B1B38] rounded-full text-sm font-bold transition-colors"
-            >
-              <T k="activities.forMe" />
-            </Link>
-          )}
-          {fitFilter && session && profile?.age === null && profile?.gradeLevel === null && (profile?.preferredLocations?.length ?? 0) === 0 && (
-            <p className="text-sm text-[#7B1B38] font-semibold">
-              <T k="activities.completeProfile" />
-            </p>
-          )}
-        </div>
-
-        {/* Filter Toolbar Component */}
-        <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] p-4 sm:p-6 shadow-md space-y-4">
-          <form action="/activities" method="GET" className="space-y-4">
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7A696C]" />
-              <LocalizedInput
-                type="text"
-                name="search"
-                defaultValue={searchQuery}
-                trPlaceholder="Başlık, açıklama, gereksinim veya konum ara..."
-                enPlaceholder="Search by title, description, requirement, or location..."
-                className="w-full pl-12 pr-4 py-3 bg-[#FFFDF9] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-[#2B0510] dark:text-[#f5e8d0] placeholder:text-[#7A696C]/60 font-medium outline-none focus:border-[#7B1B38] focus:ring-1 focus:ring-[#7B1B38] transition-all"
-              />
-            </div>
-
-            {/* Filter Dropdowns Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
-              {/* Sort Option */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1 flex items-center gap-1">
-                  <ArrowUpDown className="w-3 h-3" /> <T k="activities.sort" />
-                </label>
-                <select
-                  name="sort"
-                  defaultValue={sortOption}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#7B1B38]/30 dark:border-[#e8637f]/40 rounded-xl text-xs sm:text-sm font-bold text-[#7B1B38] dark:text-[#f8d7df] outline-none cursor-pointer"
-                >
-                  <option value="deadline_asc"><T k="activities.sortUpcoming" /></option>
-                  <option value="newest"><T k="activities.sortNewest" /></option>
-                  <option value="deadline_desc"><T k="activities.sortLatest" /></option>
-                </select>
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.category" />
-                </label>
-                <select
-                  name="category"
-                  defaultValue={categoryFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.allCategories" /></option>
-                  <option value="COMPETITION"><T k="activities.competition" /></option>
-                  <option value="VOLUNTEER"><T k="home.volunteering" /></option>
-                  <option value="SUMMER_PROGRAM"><T k="activities.summerProgram" /></option>
-                  <option value="SCHOOL_PROGRAM"><T k="activities.schoolProgram" /></option>
-                  <option value="SCHOLARSHIP"><T k="nav.scholarships" /></option>
-                  <option value="PLATFORM"><T k="home.platforms" /></option>
-                </select>
-              </div>
-
-              {/* Season */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.season" />
-                </label>
-                <select
-                  name="season"
-                  defaultValue={seasonFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.allSeasons" /></option>
-                  <option value="SUMMER"><T k="season.summer" /></option>
-                  <option value="WINTER"><T k="season.winter" /></option>
-                  <option value="FALL"><T k="season.fall" /></option>
-                  <option value="SPRING"><T k="season.spring" /></option>
-                  <option value="YEAR_ROUND"><T k="season.yearRound" /></option>
-                </select>
-              </div>
-
-              {/* Grade Level */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.grade" />
-                </label>
-                <select
-                  name="grade"
-                  defaultValue={effectiveGradeFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.allGrades" /></option>
-                  {GRADE_LEVEL_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      <T k={`grades.${opt.key}`} />
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Age */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.age" />
-                </label>
-                <select
-                  name="age"
-                  defaultValue={effectiveAgeFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.allAges" /></option>
-                  {Array.from({ length: 8 }, (_, index) => index + 13).map((age) => (
-                    <option key={age} value={age}>{age} <T k="activities.ageWord" /></option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.location" />
-                </label>
-                <select
-                  name="location"
-                  defaultValue={locationFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.allLocations" /></option>
-                  {LOCATION_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      <LocaleText tr={option.tr} en={option.en} />
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Prestigious */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.prestige" />
-                </label>
-                <select
-                  name="prestigious"
-                  defaultValue={prestigiousFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.all" /></option>
-                  <option value="yes"><T k="activities.prestigiousOnly" /></option>
-                  <option value="no"><T k="activities.standard" /></option>
-                </select>
-              </div>
-
-              {/* Status */}
-              <div>
-                <label className="block text-xs font-bold text-[#7B1B38] uppercase mb-1">
-                  <T k="activities.status" />
-                </label>
-                <select
-                  name="status"
-                  defaultValue={statusFilter}
-                  className="w-full px-3 py-2.5 bg-[#FFF9F0] dark:bg-[#1a0a10] border border-[#F1E2D9] dark:border-[#4a2030] rounded-xl text-xs sm:text-sm font-bold text-[#2B0510] dark:text-[#f5e8d0] outline-none cursor-pointer"
-                >
-                  <option value="ALL"><T k="activities.all" /></option>
-                  <option value="open"><T k="activities.open" /></option>
-                  <option value="closed"><T k="activities.closed" /></option>
-                </select>
-              </div>
-            </div>
-
-            {/* Subject / Field Filter */}
-            <SubjectFilter selectedSubjects={subjectsFilter} />
-            {/* Submit & Reset Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#F1E2D9] dark:border-[#4a2030]">
-              <div className="text-xs font-bold text-[#2B0510]/70 dark:text-[#f5e8d0]/75 flex items-center gap-1.5">
-                <Filter className="w-4 h-4 text-[#7B1B38] dark:text-[#e8637f]" />
-                <T k="activities.count" values={{ count: activities.length }} />
-              </div>
-              <div className="flex items-center gap-2">
-                {hasActiveFilters && (
-                  <Link
-                    href="/activities"
-                    className="px-4 py-2 bg-gray-100 dark:bg-[#1a0a10] hover:bg-gray-200 dark:hover:bg-[#25101a] text-[#2B0510] dark:text-[#f5e8d0] border border-transparent dark:border-[#4a2030] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" /> <T k="activities.clearFilters" />
-                  </Link>
-                )}
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-[#7B1B38] hover:bg-[#5A1127] text-white text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer shadow-xs"
-                >
-                  <T k="activities.applyFilters" />
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        {/* Results List Grid */}
-        {activities.length === 0 ? (
-          <div className="bg-white dark:bg-[#2b1118] rounded-2xl border border-[#F1E2D9] dark:border-[#4a2030] shadow-sm p-12 text-center space-y-4">
-            <p className="text-lg text-[#2B0510]/80 dark:text-[#f5e8d0] font-semibold">
-              <T k="activities.noResults" />
-            </p>
-            <p className="text-sm text-[#2B0510]/60 dark:text-[#f5e8d0]/70 max-w-md mx-auto">
-              <T k="activities.noResultsDescription" />
-            </p>
-            <Link
-              href="/activities"
-              className="inline-block px-6 py-2.5 bg-[#7B1B38] text-white text-sm font-bold rounded-xl shadow-xs hover:bg-[#5A1127] transition-all"
-            >
-              <T k="activities.showAll" />
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map((activity) => {
-              const deadlineInfo = getDeadlineInfo(activity.deadline, activity.isClosed)
-              return (
-                <Link
-                  key={activity.id}
-                  href={`/activities/${activity.slug}`}
-                  className={`bg-white dark:bg-[#2b1118] rounded-2xl border shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:-translate-y-1.5 relative ${
-                    deadlineInfo.isExpired ? "opacity-75 border-gray-200 dark:border-gray-800" : "border-[#F1E2D9] dark:border-[#4a2030]"
-                  }`}
-                >
-                  {/* Image & Badges Overlay */}
-                  <div className="relative">
-                    <ActivityImage
-                      src={activity.imageUrl}
-                      alt={activity.name}
-                      className="w-full h-40 sm:h-48 object-cover"
-                    />
-
-                    {/* Top Badges */}
-                    <div className="absolute top-3 left-3 right-3 flex justify-between items-center gap-2">
-                      <span className={`px-3 py-1.5 text-xs rounded-full shadow-md backdrop-blur-md ${deadlineInfo.color}`}>
-                        <LocaleText tr={deadlineInfo.tr} en={deadlineInfo.en} />
-                      </span>
-                      {activity.isPrestigious && (
-                        <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-[#7B1B38] text-[#FFFDF9] whitespace-nowrap shrink-0 uppercase tracking-wider shadow-sm">
-                          <T k="activities.prestigious" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-6 space-y-4 flex-1 flex flex-col">
-                    <div className="flex-1 space-y-2">
-                      <h3 className="text-lg font-bold text-[#2B0510] dark:text-[#f5e8d0] line-clamp-2">
-                        {activity.name}
-                      </h3>
-
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#FFE5B4]/50 dark:bg-[#4a2030] text-[#7B1B38] dark:text-[#f8d7df]">
-                          {categoryLabels[activity.category] ? <LocaleText {...categoryLabels[activity.category]} /> : activity.category}
-                        </span>
-                        {activity.season && (
-                          <span className="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#F1E2D9]/60 dark:bg-[#3d1a24] text-[#2B0510]/80 dark:text-[#f5e8d0]/80">
-                            {seasonLabels[activity.season] ? <LocaleText {...seasonLabels[activity.season]} /> : activity.season}
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-sm text-[#2B0510]/85 dark:text-[#f5e8d0]/80 line-clamp-3 leading-relaxed font-medium pt-1">
-                        <LocalizedDescription text={activity.description} />
-                      </p>
-                    </div>
-
-                    <div className="space-y-2 text-xs text-[#2B0510]/75 dark:text-[#f5e8d0]/80 pt-4 border-t border-[#F1E2D9] dark:border-[#4a2030]">
-                      {activity.location && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 shrink-0 text-[#7B1B38] dark:text-[#e8637f]" />
-                          <span className="truncate text-[#7A696C] dark:text-[#f5e8d0] font-medium">{activity.location}</span>
-                        </div>
-                      )}
-                      <div className={`flex items-center gap-2 p-2 rounded-lg ${deadlineInfo.isExpired ? "bg-gray-100 dark:bg-[#1a0a10] text-gray-600 dark:text-gray-300 border border-transparent dark:border-[#4a2030]" : "bg-[#FFF9F0] dark:bg-[#1a0a10] text-[#7B1B38] dark:text-[#f8d7df] border border-transparent dark:border-[#4a2030]"}`}>
-                        <Clock className="w-4 h-4 shrink-0 text-[#7B1B38] dark:text-[#e8637f]" />
-                        <span className="font-bold">
-                          <T k="activities.deadline" />: {activity.deadline ? <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} /> : <T k="activities.notSpecified" />}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 flex justify-between items-center border-t border-[#F1E2D9]/40 dark:border-[#4a2030] mt-auto">
-                      <span className="text-[#7B1B38] dark:text-[#e8637f] font-bold text-sm">
-                        <T k="activities.details" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        )}
+        <Suspense fallback={<div className="h-96 flex items-center justify-center text-[#7B1B38] font-bold">Yükleniyor...</div>}>
+          <ActivitiesClient initialActivities={activities} />
+        </Suspense>
       </div>
     </main>
   )

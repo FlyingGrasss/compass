@@ -1,6 +1,7 @@
 // prisma/data/competitions.ts
 
 import { ActivityCategory, ActivitySeason } from "@prisma/client"
+import { KNOWN_ACTIVITY_SUBJECTS } from "../../lib/activity-subjects"
 
 export type CompetitionSeed = {
   name: string
@@ -8,6 +9,7 @@ export type CompetitionSeed = {
   description: string
   category: ActivityCategory
   gradeLevels: number[]
+  subjectTags?: string[]
   financialSupport: string
   entryPrice?: number | null
   scholarshipAmount?: number | string | null
@@ -36,7 +38,7 @@ const community =
 const creative =
   "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=60"
 
-export const competitions: CompetitionSeed[] = [
+const rawCompetitions: CompetitionSeed[] = [
   // —— Platforms & directories ——
   {
     name: "TEKNOFEST Yarışmalar",
@@ -599,3 +601,8 @@ export const competitions: CompetitionSeed[] = [
     imageUrl: creative,
   },
 ]
+
+export const competitions: CompetitionSeed[] = rawCompetitions.map((entry) => ({
+  ...entry,
+  subjectTags: entry.subjectTags || KNOWN_ACTIVITY_SUBJECTS[entry.slug] || [],
+}))

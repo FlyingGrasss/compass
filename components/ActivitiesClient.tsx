@@ -266,7 +266,7 @@ export default function ActivitiesClient({ initialActivities }: ActivitiesClient
       {/* Header */}
       <div className="text-center space-y-3">
         {/* Pill Badge with Dark Mode Fix */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/50 dark:bg-[#FFE5B4] border border-[#FFE5B4] dark:border-[#FFD98A] text-[#7B1B38] text-xs font-bold uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE5B4]/50 dark:bg-[#4a2030]/60 border border-[#FFE5B4] dark:border-[#e8637f]/40 text-[#7B1B38] dark:text-[#f8d7df] text-xs font-bold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" /> <T k="activities.badge" />
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-[#7B1B38] dark:text-[#f8d7df] tracking-tight">

@@ -16,19 +16,42 @@ import Link from "next/link"
 import { formatAmount } from "@/lib/format-amount"
 import { LocalizedDescription, LocaleText, T } from "@/lib/i18n"
 import ActivityImage from "@/components/ActivityImage"
+import { SUBJECT_OPTIONS, KNOWN_ACTIVITY_SUBJECTS } from "@/lib/activity-subjects"
 import { formatGradeLevels } from "@/lib/grade-levels"
+
+export const revalidate = 300
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  try {
+    const activities = await prisma.activity.findMany({
+      select: { slug: true },
+    })
+    return activities.map((activity) => ({
+      slug: activity.slug,
+    }))
+  } catch (error) {
+    console.error("Failed to generate static params for activities:", error)
+    return []
+  }
+}
 
 export default async function ActivityDetailPage({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
+  const resolvedParams = await params
   const activity = await prisma.activity.findUnique({
-    where: { slug: (await params).slug },
+    where: { slug: resolvedParams.slug },
   })
 
   if (!activity) {
     notFound()
+  }
+
+  if (!activity.subjectTags || activity.subjectTags.length === 0) {
+    activity.subjectTags = KNOWN_ACTIVITY_SUBJECTS[activity.slug] || []
   }
 
   const categoryLabels: Record<ActivityCategory, { tr: string; en: string }> = {
@@ -80,7 +103,7 @@ export default async function ActivityDetailPage({
           <div className="p-8 space-y-8">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFE5B4]/50 text-[#7B1B38]">
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFE5B4]/50 dark:bg-[#4a2030] text-[#7B1B38] dark:text-[#f8d7df]">
                   <LocaleText {...categoryLabels[activity.category as ActivityCategory]} />
                 </span>
                 {activity.isPrestigious && (
@@ -90,14 +113,23 @@ export default async function ActivityDetailPage({
                   </span>
                 )}
                 {isEffectivelyClosed ? (
-                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-700">
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-transparent dark:border-red-900/40">
                     <T k="detail.closed" />
                   </span>
                 ) : (
-                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700">
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-transparent dark:border-emerald-900/40">
                     <T k="detail.open" />
                   </span>
                 )}
+                {activity.subjectTags?.map((tag) => {
+                  const subjectOpt = SUBJECT_OPTIONS.find((s) => s.value === tag)
+                  if (!subjectOpt) return null
+                  return (
+                    <span key={tag} className="px-3 py-1 text-xs font-bold rounded-full bg-[#FFF9F0] dark:bg-[#341620] border border-[#F1E2D9] dark:border-[#4a2030] text-[#7B1B38] dark:text-[#f8d7df]">
+                      <LocaleText tr={subjectOpt.tr} en={subjectOpt.en} />
+                    </span>
+                  )
+                })}
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-[#2B0510] dark:text-[#f5e8d0] tracking-tight leading-tight">
                 {activity.name}
@@ -112,7 +144,7 @@ export default async function ActivityDetailPage({
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.location" /></p>
-                    <p className="font-bold text-sm">{activity.location}</p>
+                    <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">{activity.location}</p>
                   </div>
                 </div>
               )}
@@ -122,8 +154,8 @@ export default async function ActivityDetailPage({
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.duration" /></p>
-                  <p className="font-bold text-sm">{activity.duration}</p>
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.duration" /></p>
+                  <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">{activity.duration}</p>
                 </div>
               </div>
 
@@ -132,8 +164,8 @@ export default async function ActivityDetailPage({
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.season" /></p>
-                    <p className="font-bold text-sm"><LocaleText {...seasonLabels[activity.season as keyof typeof seasonLabels]} /></p>
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.season" /></p>
+                  <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]"><LocaleText {...seasonLabels[activity.season as keyof typeof seasonLabels]} /></p>
                 </div>
               </div>
 
@@ -144,7 +176,7 @@ export default async function ActivityDetailPage({
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.deadline" /></p>
-                    <p className="font-bold text-sm">
+                    <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">
                       <LocaleText tr={new Date(activity.deadline).toLocaleDateString("tr-TR")} en={new Date(activity.deadline).toLocaleDateString("en-US")} />
                     </p>
                   </div>
@@ -161,13 +193,13 @@ export default async function ActivityDetailPage({
                       ? <T k="detail.scholarshipAmount" />
                       : <T k="detail.financialSupport" />}
                   </p>
-                  <p className="font-bold text-sm">
+                  <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">
                     {activity.scholarshipAmount != null
                       ? activity.scholarshipAmount
                       : financialLabels[activity.financialSupport] ? <LocaleText {...financialLabels[activity.financialSupport]} /> : activity.financialSupport}
                   </p>
                   {activity.scholarshipAmount != null && (
-                    <p className="text-xs text-[#7A696C] mt-0.5">
+                    <p className="text-xs text-[#7A696C] dark:text-[#c4a08a] mt-0.5">
                       {financialLabels[activity.financialSupport] ? <LocaleText {...financialLabels[activity.financialSupport]} /> : activity.financialSupport}
                     </p>
                   )}
@@ -183,7 +215,7 @@ export default async function ActivityDetailPage({
                     <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]">
                       <T k="detail.entryFee" />
                     </p>
-                    <p className="font-bold text-sm">
+                    <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">
                       {Number(activity.entryPrice) === 0
                         ? <T k="detail.free" />
                         : formatAmount(
@@ -200,15 +232,15 @@ export default async function ActivityDetailPage({
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.targetGrades" /></p>
-                  <p className="font-bold text-sm">
+                  <p className="text-[10px] uppercase font-bold text-[#7A696C] dark:text-[#c4a08a]"><T k="detail.targetGrades" /></p>
+                  <p className="font-bold text-sm text-[#2B0510] dark:text-[#f5e8d0]">
                     <LocaleText
                       tr={formatGradeLevels(activity.gradeLevels, "tr")}
                       en={formatGradeLevels(activity.gradeLevels, "en")}
                     />
                   </p>
                   {(activity.minAge !== null || activity.maxAge !== null) && (
-                    <p className="font-bold text-sm mt-1">
+                    <p className="font-bold text-sm mt-1 text-[#2B0510] dark:text-[#f5e8d0]">
                       {activity.minAge !== null && activity.maxAge !== null
                         ? `${activity.minAge}-${activity.maxAge}`
                         : activity.minAge !== null
@@ -221,27 +253,27 @@ export default async function ActivityDetailPage({
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
+              <h2 className="text-xl font-bold text-[#7B1B38] dark:text-[#f8d7df] border-b border-[#F1E2D9] dark:border-[#4a2030] pb-2">
                 <T k="detail.description" />
               </h2>
-              <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm text-justify">
+              <p className="text-[#2B0510]/90 dark:text-[#f5e8d0]/90 whitespace-pre-line leading-relaxed font-medium text-sm text-justify">
                 <LocalizedDescription text={activity.description} />
               </p>
             </div>
 
             {activity.requirements && (
               <div className="space-y-4 pt-4">
-                <h2 className="text-xl font-bold text-[#7B1B38] border-b border-[#F1E2D9] pb-2">
+                <h2 className="text-xl font-bold text-[#7B1B38] dark:text-[#f8d7df] border-b border-[#F1E2D9] dark:border-[#4a2030] pb-2">
                   <T k="detail.requirements" />
                 </h2>
-                <p className="text-[#2B0510]/90 whitespace-pre-line leading-relaxed font-medium text-sm">
+                <p className="text-[#2B0510]/90 dark:text-[#f5e8d0]/90 whitespace-pre-line leading-relaxed font-medium text-sm">
                   <LocalizedDescription text={activity.requirements} />
                 </p>
               </div>
             )}
 
             {activity.website && (
-              <div className="pt-6 border-t border-[#F1E2D9]">
+              <div className="pt-6 border-t border-[#F1E2D9] dark:border-[#4a2030]">
                 <a
                   href={activity.website}
                   target="_blank"

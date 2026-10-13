@@ -6,6 +6,7 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import { competitions } from "./data/competitions"
 import { getLocationTags, normalizeLocation } from "../lib/activity-location"
+import { KNOWN_ACTIVITY_SUBJECTS } from "../lib/activity-subjects"
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -450,6 +451,7 @@ async function main() {
         requirements: scholarship.requirements,
         website: scholarship.website,
         imageUrl: scholarship.imageUrl,
+        subjectTags: KNOWN_ACTIVITY_SUBJECTS[scholarship.slug] || [],
       },
       create: {
         name: scholarship.name,
@@ -471,6 +473,7 @@ async function main() {
         requirements: scholarship.requirements,
         website: scholarship.website,
         imageUrl: scholarship.imageUrl,
+        subjectTags: KNOWN_ACTIVITY_SUBJECTS[scholarship.slug] || [],
       },
     })
   }
@@ -502,6 +505,7 @@ async function main() {
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,
+        subjectTags: entry.subjectTags || KNOWN_ACTIVITY_SUBJECTS[entry.slug] || [],
       },
       create: {
         name: entry.name,
@@ -524,6 +528,7 @@ async function main() {
         requirements: entry.requirements,
         website: entry.website,
         imageUrl: entry.imageUrl,
+        subjectTags: entry.subjectTags || KNOWN_ACTIVITY_SUBJECTS[entry.slug] || [],
       },
     })
   }

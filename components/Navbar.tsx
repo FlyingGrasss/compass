@@ -20,10 +20,21 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
 
   const handleSignOut = async () => {
-    await signOut()
-    toast.success("Çıkış yapıldı")
-    router.push("/auth/sign-in")
-    setIsOpen(false)
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Çıkış yapıldı")
+            setIsOpen(false)
+            window.location.href = "/"
+          },
+        },
+      })
+    } catch {
+      toast.success("Çıkış yapıldı")
+      setIsOpen(false)
+      window.location.href = "/"
+    }
   }
 
   return (
