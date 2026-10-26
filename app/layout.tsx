@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { LanguageProvider } from "@/lib/i18n"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import { Analytics } from "@vercel/analytics/next"
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
@@ -88,6 +89,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <Toaster />
+            <Analytics />
           </LanguageProvider>
         </ThemeProvider>
       </body>
